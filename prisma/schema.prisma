@@ -1,0 +1,38 @@
+// Team FORWARD year-end feedback — PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model FeedbackSubmission {
+  id                 String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+
+  subjectMemberId    String
+  subjectDisplayName String
+
+  submitterName      String
+  submitterEmail     String
+  relationship       String
+
+  /// Array of { skillKey, skillLabel, score }
+  skillScores        Json
+
+  /// Selected Intuit values (canonical strings from config)
+  intuitValues         Json
+
+  narrativeBestWork  String @db.Text
+  narrativeAdvice    String @db.Text
+  narrativeOther     String @db.Text
+
+  submitterIp        String?
+  userAgent          String?
+
+  @@index([subjectMemberId])
+  @@index([createdAt])
+  @@index([submitterEmail])
+}

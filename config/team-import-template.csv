@@ -1,0 +1,3 @@
+id,displayName,operatingLevel,skill_1,skill_2,skill_3,skill_4,skill_5
+# Lines starting with # are ignored. One data row per teammate.
+jane-doe,Jane Doe,Senior,Strategy & prioritization,Execution & delivery,Collaboration & partnership,Communication & clarity,Leadership & influence
