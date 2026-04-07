@@ -7,7 +7,6 @@
  * 3. Optional: set FORM_SECRET in Script properties and the same string here.
  */
 const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/a/macros/intuit.com/s/AKfycbzKB6joGCeUbm7EA3q80iFFS5zaxtAAnTiwHTD8Py8rqhaoT88KXY7qJ4A537TKHsD6/exec";
-
 /** Optional — must match Script property FORM_SECRET if you set one */
 const FORM_SECRET = "";
 
@@ -104,9 +103,11 @@ function postToGoogleSheet(payload) {
 
     function onMessage(ev) {
       if (!ev.data || ev.data.type !== "team-forward-feedback") return;
+      // GAS HtmlOutput may run on script.google.com or *.googleusercontent.com nested frames.
       if (
-        typeof ev.origin === "string" &&
-        ev.origin.indexOf("script.google.com") === -1
+        typeof ev.origin !== "string" ||
+        (ev.origin.indexOf("script.google.com") === -1 &&
+          ev.origin.indexOf("googleusercontent.com") === -1)
       ) {
         return;
       }

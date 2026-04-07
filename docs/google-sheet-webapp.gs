@@ -71,12 +71,19 @@ function doPost(e) {
       p.submission_json || "",
     ]);
 
-    return HtmlService.createHtmlOutput(
-      "<html><body><script>(function(){try{window.parent.postMessage({type:\"team-forward-feedback\",ok:true},\"*\");}catch(e){}})();</script>OK</body></html>",
-    );
+    return ackHtml(true);
   } catch (err) {
-    return HtmlService.createHtmlOutput(
-      "<html><body><script>(function(){try{window.parent.postMessage({type:\"team-forward-feedback\",ok:false},\"*\");}catch(e){}})();</script>Error</body></html>",
-    );
+    return ackHtml(false);
   }
+}
+
+/** Notify the GitHub Pages parent window (use top — GAS may nest iframes). */
+function ackHtml(ok) {
+  var script =
+    "(function(){try{window.top.postMessage({type:\"team-forward-feedback\",ok:" +
+    (ok ? "true" : "false") +
+    '},\"*\");}catch(e){}})();';
+  return HtmlService.createHtmlOutput(
+    "<html><body><script>" + script + "</script>" + (ok ? "OK" : "Error") + "</body></html>",
+  ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
