@@ -128,7 +128,9 @@ export function FeedbackForm({ members, intuitValues, relationships }: Props) {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-8 max-w-2xl">
       <fieldset className="flex flex-col gap-2 border-0 p-0">
-        <legend className="text-sm font-medium text-zinc-400 mb-1">Feedback for</legend>
+        <legend className="text-sm font-medium text-zinc-400 mb-1">
+          Start by selecting who you are sharing feedback for:
+        </legend>
         <label htmlFor="subject" className="sr-only">
           Teammate
         </label>
