@@ -1,8 +1,15 @@
 /**
- * Static GitHub Pages + Formspree — no backend.
- * Update team.json / intuit-values.json when roster changes (copy from ../config/).
+ * Static GitHub Pages → Google Apps Script → Google Sheet.
+ * Copy config: npm run docs:sync
+ *
+ * 1. Deploy google-sheet-webapp.gs (see comments in that file).
+ * 2. Paste Web App URL below (must end with /exec).
+ * 3. Optional: set FORM_SECRET in Script properties and the same string here.
  */
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/mojprqgo";
+const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/a/macros/intuit.com/s/AKfycbzKB6joGCeUbm7EA3q80iFFS5zaxtAAnTiwHTD8Py8rqhaoT88KXY7qJ4A537TKHsD6/exec";
+
+/** Optional — must match Script property FORM_SECRET if you set one */
+const FORM_SECRET = "";
 
 const RELATIONSHIPS = [
   { value: "direct_report", label: "Direct report" },
@@ -84,10 +91,74 @@ function formatSkillsForEmail(members, subjectId, scores) {
     .join("\n");
 }
 
+/**
+ * POST fields to Apps Script via hidden form + iframe (avoids CORS on fetch).
+ */
+function postToGoogleSheet(payload) {
+  return new Promise((resolve, reject) => {
+    const ms = 25000;
+    const timeout = setTimeout(() => {
+      window.removeEventListener("message", onMessage);
+      reject(new Error("Timed out — check the Web App URL and Sheet permissions."));
+    }, ms);
+
+    function onMessage(ev) {
+      if (!ev.data || ev.data.type !== "team-forward-feedback") return;
+      if (
+        typeof ev.origin === "string" &&
+        ev.origin.indexOf("script.google.com") === -1
+      ) {
+        return;
+      }
+      clearTimeout(timeout);
+      window.removeEventListener("message", onMessage);
+      if (ev.data.ok) {
+        resolve();
+      } else {
+        reject(new Error("Google Sheet rejected the submission."));
+      }
+    }
+    window.addEventListener("message", onMessage);
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = GOOGLE_SCRIPT_WEBAPP_URL;
+    form.target = "sheet-iframe";
+    form.acceptCharset = "UTF-8";
+    form.style.display = "none";
+
+    const flat = { ...payload };
+    if (FORM_SECRET) {
+      flat.form_secret = FORM_SECRET;
+    }
+
+    for (const [k, v] of Object.entries(flat)) {
+      const inp = document.createElement("input");
+      inp.type = "hidden";
+      inp.name = k;
+      inp.value = String(v ?? "");
+      form.appendChild(inp);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  });
+}
+
 async function init() {
   const loading = document.getElementById("loading");
   const formRoot = document.getElementById("form-root");
   const done = document.getElementById("done");
+
+  if (
+    !GOOGLE_SCRIPT_WEBAPP_URL ||
+    GOOGLE_SCRIPT_WEBAPP_URL.indexOf("REPLACE_ME") !== -1
+  ) {
+    loading.textContent =
+      "Set GOOGLE_SCRIPT_WEBAPP_URL in docs/app.js (see docs/google-sheet-webapp.gs).";
+    return;
+  }
 
   let members;
   let intuitValues;
@@ -121,7 +192,6 @@ async function init() {
   form.id = "feedback-form";
   form.setAttribute("novalidate", "");
 
-  // Subject
   const fSubject = document.createElement("div");
   fSubject.innerHTML = `<label class="field-label" for="subject">Feedback for</label>`;
   const subjectSelect = document.createElement("select");
@@ -137,7 +207,6 @@ async function init() {
   fSubject.appendChild(subjectSelect);
   form.appendChild(fSubject);
 
-  // Name + email
   const row = document.createElement("div");
   row.className = "row2";
   row.innerHTML = `
@@ -151,7 +220,6 @@ async function init() {
     </div>`;
   form.appendChild(row);
 
-  // Relationship
   const fRel = document.createElement("div");
   const relLabel = document.createElement("label");
   relLabel.className = "field-label";
@@ -169,7 +237,6 @@ async function init() {
   fRel.appendChild(relSelect);
   form.appendChild(fRel);
 
-  // Skills fieldset
   const skillsFs = document.createElement("fieldset");
   skillsFs.className = "skills";
   const skillsLegend = document.createElement("legend");
@@ -184,7 +251,6 @@ async function init() {
   skillsFs.appendChild(skillsContainer);
   form.appendChild(skillsFs);
 
-  // Intuit
   const intuitFs = document.createElement("fieldset");
   intuitFs.className = "intuit";
   const intuitLegend = document.createElement("legend");
@@ -196,7 +262,6 @@ async function init() {
   intuitFs.appendChild(intuitUl);
   form.appendChild(intuitFs);
 
-  // Narratives
   const n1 = document.createElement("div");
   n1.innerHTML = `
     <label class="field-label" for="narrativeBestWork">Best work this year — what made it awesome and the impact</label>
@@ -299,8 +364,6 @@ async function init() {
     const intuitJoined = [...selectedIntuit].sort().join("; ");
 
     const payload = {
-      _replyto: submitterEmail,
-      _subject: `Team FORWARD: feedback for ${subject.displayName}`,
       submitter_name: submitterName,
       submitter_email: submitterEmail,
       feedback_for: subject.displayName,
@@ -331,26 +394,12 @@ async function init() {
     };
 
     try {
-      const res = await fetch(FORMSPREE_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        err.textContent =
-          data.error || res.statusText || "Submit failed. Try again.";
-        err.classList.remove("hidden");
-        submitBtn.disabled = false;
-        return;
-      }
+      await postToGoogleSheet(payload);
       formRoot.classList.add("hidden");
       done.classList.remove("hidden");
-    } catch {
-      err.textContent = "Network error — try again.";
+    } catch (fe) {
+      err.textContent =
+        fe instanceof Error ? fe.message : "Submit failed. Try again.";
       err.classList.remove("hidden");
       submitBtn.disabled = false;
     }

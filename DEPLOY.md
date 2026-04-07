@@ -57,16 +57,16 @@ npm start
 
 Run behind **HTTPS** (corporate load balancer, ingress TLS, or reverse proxy). Restrict **admin** routes (`/admin`, `/api/admin/*`) at the network layer if your security team requires defense in depth (e.g. allowlist VPN or admin SSO in front of the app — this template uses password + signed cookie).
 
-## GitHub Pages + Formspree (static, no database)
+## GitHub Pages + Google Sheet (static site, no database)
 
-For a **simple public URL** without running Node or Postgres: use the **`docs/`** folder in this repo. It is a **static** form that POSTs submissions to **[Formspree](https://formspree.io)** (`docs/app.js` contains your form endpoint).
+For a **simple public URL** without running Node or Postgres: use the **`docs/`** folder. The static form POSTs through **Google Apps Script** into a **Google Sheet** you own (see **`docs/google-sheet-webapp.gs`**). Set **`GOOGLE_SCRIPT_WEBAPP_URL`** in **`docs/app.js`** to your deployed Web App URL (ends in `/exec`).
 
-1. **Sync roster** from `config/` into `docs/` whenever you change teammates or Intuit values:  
-   `npm run docs:sync`
-2. In the GitHub repo: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, branch **main**, folder **`/docs`**, Save.
-3. After a minute, the site is at **`https://<user>.github.io/<repo>/`** (unless you use a custom domain).
+1. **Sync roster** from `config/` into `docs/`: `npm run docs:sync`
+2. Deploy the Apps Script and paste the Web App URL into **`docs/app.js`**, then commit and push.
+3. **Settings → Pages** → branch **main**, folder **`/docs`**.
+4. Site URL: **`https://<user>.github.io/<repo>/`**
 
-**First Formspree submission:** check your inbox to **activate** the form if Formspree asks. Submissions appear in Formspree’s dashboard and in email — **not** in the Next.js admin UI or Postgres.
+Export data anytime from **Google Sheets** (File → Download) — no third-party export paywall.
 
 ## Shareable URL (hosted Postgres required)
 
