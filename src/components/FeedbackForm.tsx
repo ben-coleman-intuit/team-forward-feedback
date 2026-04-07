@@ -131,6 +131,9 @@ export function FeedbackForm({ members, intuitValues, relationships }: Props) {
         <legend className="text-sm font-medium text-zinc-400 mb-1">
           Start by selecting who you are sharing feedback for:
         </legend>
+        <p className="text-sm italic text-zinc-500 mb-2 mt-0">
+          Survey questions and craft skills will update according to the individual you select
+        </p>
         <label htmlFor="subject" className="sr-only">
           Teammate
         </label>

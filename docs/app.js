@@ -194,7 +194,7 @@ async function init() {
   form.setAttribute("novalidate", "");
 
   const fSubject = document.createElement("div");
-  fSubject.innerHTML = `<label class="field-label" for="subject">Start by selecting who you are sharing feedback for:</label>`;
+  fSubject.innerHTML = `<label class="field-label" for="subject">Start by selecting who you are sharing feedback for:</label><p class="field-hint">Survey questions and craft skills will update according to the individual you select</p>`;
   const subjectSelect = document.createElement("select");
   subjectSelect.id = "subject";
   subjectSelect.required = true;

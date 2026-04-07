@@ -61,6 +61,14 @@ label.field-label {
   margin-bottom: 0.25rem;
 }
 
+.field-hint {
+  font-size: 0.875rem;
+  font-style: italic;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+  line-height: 1.45;
+}
+
 input[type="text"],
 input[type="email"],
 select,
