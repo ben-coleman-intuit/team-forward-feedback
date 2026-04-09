@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Anonymous leadership feedback</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Anonymous</p>
+      <h1>Leadership feedback</h1>
+      <p class="intro">
+        Rate your manager on each dimension below (1 = strongly disagree, 10 = strongly agree).
+        This survey is <strong>completely anonymous</strong> — no names or emails are collected.
+      </p>
+
+      <p id="config-warning" class="msg error hidden"></p>
+
+      <div id="form-root"></div>
+
+      <div id="done" class="success hidden">
+        <h2>Thank you</h2>
+        <p>Your anonymous feedback has been recorded.</p>
+      </div>
+    </main>
+    <iframe name="sheet-iframe" id="sheet-iframe" title="Submission" style="display:none"></iframe>
+    <script src="app.js" defer></script>
+  </body>
+</html>
