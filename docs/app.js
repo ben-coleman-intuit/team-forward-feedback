@@ -233,6 +233,12 @@ async function init() {
   const relSelect = document.createElement("select");
   relSelect.id = "relationship";
   relSelect.required = true;
+  const relPlaceholder = document.createElement("option");
+  relPlaceholder.value = "";
+  relPlaceholder.textContent = "— select from list —";
+  relPlaceholder.disabled = true;
+  relPlaceholder.selected = true;
+  relSelect.appendChild(relPlaceholder);
   RELATIONSHIPS.forEach((r) => {
     const opt = document.createElement("option");
     opt.value = r.value;
