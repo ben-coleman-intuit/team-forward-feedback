@@ -198,13 +198,18 @@ async function init() {
   const subjectSelect = document.createElement("select");
   subjectSelect.id = "subject";
   subjectSelect.required = true;
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "— select from list —";
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  subjectSelect.appendChild(placeholder);
   members.forEach((m) => {
     const opt = document.createElement("option");
     opt.value = m.id;
     opt.textContent = m.displayName;
     subjectSelect.appendChild(opt);
   });
-  subjectSelect.value = defaultId;
   fSubject.appendChild(subjectSelect);
   form.appendChild(fSubject);
 
