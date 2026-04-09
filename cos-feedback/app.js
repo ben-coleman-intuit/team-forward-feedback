@@ -1,19 +1,22 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 /**
- * Config is set in index.html (mirror values from .env for local work).
- * The anon key is safe in the browser only with RLS policies you trust — see supabase/schema.sql.
+ * Replace with your project (Supabase → Project Settings → API).
+ * The anon key is meant for browser use; lock down access with Row Level Security on `responses`.
  */
-const SUPABASE_URL = window.COS_SUPABASE_URL;
-const SUPABASE_ANON_KEY = window.COS_SUPABASE_ANON_KEY;
+const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
+const SUPABASE_KEY = "YOUR_ANON_KEY";
 
 const PLACEHOLDER =
   typeof SUPABASE_URL === "string" &&
-  (SUPABASE_URL.includes("REPLACE_WITH") || !SUPABASE_URL.startsWith("http"));
+  (SUPABASE_URL.includes("YOUR_PROJECT_ID") ||
+    !SUPABASE_KEY ||
+    SUPABASE_KEY === "YOUR_ANON_KEY" ||
+    !SUPABASE_URL.startsWith("http"));
 
 let supabase = null;
-if (!PLACEHOLDER && SUPABASE_URL && SUPABASE_ANON_KEY) {
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+if (!PLACEHOLDER && SUPABASE_URL && SUPABASE_KEY) {
+  supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
 function showConfigWarning() {
@@ -21,7 +24,7 @@ function showConfigWarning() {
   if (!el) return;
   el.classList.remove("hidden");
   el.textContent =
-    "Configure window.COS_SUPABASE_URL and window.COS_SUPABASE_ANON_KEY at the top of index.html (copy from .env / Supabase API settings).";
+    "Set SUPABASE_URL and SUPABASE_KEY at the top of app.js (Supabase → Settings → API).";
 }
 
 function setFormMsg(text, kind) {

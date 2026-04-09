@@ -3,28 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Peer feedback — COS</title>
+    <title>Internal peer feedback</title>
     <link rel="stylesheet" href="styles.css" />
-    <!--
-      Supabase: the anon key is designed to be public in the browser.
-      Security comes from Row Level Security (RLS) on the `responses` table — keep RLS
-      ENABLED in the Supabase dashboard and review policies in supabase/schema.sql.
-
-      Local dev: copy .env.example to .env, fill values, mirror them into the script below.
-      GitHub Pages cannot read .env; deploy with real values in the placeholders (or use a CI inject step).
-    -->
-    <script>
-      window.COS_SUPABASE_URL = "REPLACE_WITH_SUPABASE_URL";
-      window.COS_SUPABASE_ANON_KEY = "REPLACE_WITH_SUPABASE_ANON_KEY";
-    </script>
+    <!-- Supabase URL + anon key: edit constants at the top of app.js (RLS on `responses` required). -->
     <script type="module" src="app.js"></script>
   </head>
   <body>
     <main>
-      <p class="eyebrow">Peer feedback</p>
-      <h1>Survey</h1>
+      <p class="eyebrow">Internal stakeholders</p>
+      <h1>Peer feedback</h1>
       <p class="intro">
-        Submit structured feedback once per teammate. Responses sync to a shared dashboard (Supabase).
+        Use this page to submit structured feedback for a teammate. Submissions appear in the
+        dashboard below for the program leads. Treat content as confidential within the team.
       </p>
 
       <p id="config-warning" class="msg error hidden"></p>

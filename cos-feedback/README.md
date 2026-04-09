@@ -12,15 +12,16 @@ when **GitHub Pages** uses the **root** of the `main` branch (`/`). If your repo
 2. **SQL Editor** → run `supabase/schema.sql` (creates `responses`, enables **RLS**, adds anon `insert` / `select` policies).
 3. **Project Settings → API**: copy **Project URL** and **anon public** key.
 
-## Local configuration
+## Configuration
 
-```bash
-cd cos-feedback
-cp .env.example .env
-# Edit .env with your URL and anon key
+Edit the two constants at the top of **`app.js`**:
+
+```js
+const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
+const SUPABASE_KEY = "YOUR_ANON_KEY";
 ```
 
-Mirror those values into the `<script>` block at the top of `index.html` (replace `REPLACE_WITH_*`). Static hosts do not load `.env` at runtime.
+Replace with **Project URL** and **anon public** key from Supabase → **Settings → API**. Commit and push so GitHub Pages serves the updated file.
 
 ## Security note
 
