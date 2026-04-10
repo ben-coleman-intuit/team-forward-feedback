@@ -59,7 +59,7 @@ h1 {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.75rem;
 }
 
 .rating-item {
@@ -68,40 +68,60 @@ h1 {
   gap: 0.35rem;
 }
 
-.rating-item .label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.rating-item .label-row .cat-label {
+.cat-label {
   font-size: 0.95rem;
   font-weight: 500;
 }
 
-.rating-item .label-row .cat-desc {
+.cat-desc {
   font-size: 0.8rem;
   color: var(--muted);
+  margin: 0;
 }
 
-.rating-item .score-display {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--accent);
-  min-width: 1.5rem;
-  text-align: right;
+/* Number box row */
+.number-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 0.25rem;
 }
 
-.slider-row {
+.number-box {
+  flex: 1;
+  aspect-ratio: 1;
+  max-width: 3rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-input[type="range"] {
-  flex: 1;
-  accent-color: var(--accent);
-  height: 6px;
+.number-box:hover {
+  border-color: var(--muted);
+}
+
+.number-box.selected {
+  color: #fff;
+  font-weight: 700;
+  border-color: transparent;
+}
+
+.scale-hint {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 2px;
+  padding: 0 2px;
 }
 
 textarea {

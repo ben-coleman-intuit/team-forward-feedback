@@ -17,6 +17,60 @@ const CATEGORIES = [
   { key: "availability", label: "Availability & Accessibility", desc: "Makes time for you when you need it" },
 ];
 
+/** Red(1) → grey(5) → green(10) */
+function scoreColor(v) {
+  const t = (Math.max(1, Math.min(10, v)) - 1) / 9;
+  if (t < 0.5) {
+    const p = t / 0.5;
+    return "rgb(" +
+      Math.round(239 + (161 - 239) * p) + "," +
+      Math.round(68 + (161 - 68) * p) + "," +
+      Math.round(68 + (161 - 68) * p) + ")";
+  }
+  const p = (t - 0.5) / 0.5;
+  return "rgb(" +
+    Math.round(161 + (74 - 161) * p) + "," +
+    Math.round(161 + (222 - 161) * p) + "," +
+    Math.round(161 + (128 - 161) * p) + ")";
+}
+
+const selections = {};
+
+function buildNumberRow(catKey) {
+  const row = document.createElement("div");
+  row.className = "number-row";
+
+  for (let i = 1; i <= 10; i++) {
+    const box = document.createElement("div");
+    box.className = "number-box";
+    box.textContent = i;
+    box.dataset.value = i;
+
+    box.addEventListener("click", () => {
+      if (selections[catKey] === i) {
+        delete selections[catKey];
+        box.classList.remove("selected");
+        box.style.background = "";
+        box.style.borderColor = "";
+        return;
+      }
+      selections[catKey] = i;
+      row.querySelectorAll(".number-box").forEach((b) => {
+        b.classList.remove("selected");
+        b.style.background = "";
+        b.style.borderColor = "";
+      });
+      box.classList.add("selected");
+      box.style.background = scoreColor(i);
+      box.style.borderColor = "transparent";
+    });
+
+    row.appendChild(box);
+  }
+
+  return row;
+}
+
 function init() {
   const formRoot = document.getElementById("form-root");
   const done = document.getElementById("done");
@@ -29,38 +83,24 @@ function init() {
     const item = document.createElement("div");
     item.className = "rating-item";
 
-    const labelRow = document.createElement("div");
-    labelRow.className = "label-row";
-    const catLabel = document.createElement("span");
+    const catLabel = document.createElement("div");
     catLabel.className = "cat-label";
     catLabel.textContent = cat.label;
-    labelRow.appendChild(catLabel);
 
     const descP = document.createElement("p");
-    descP.style.margin = "0";
-    descP.style.fontSize = "0.8rem";
-    descP.style.color = "#a1a1aa";
+    descP.className = "cat-desc";
     descP.textContent = cat.desc;
 
-    const sliderRow = document.createElement("div");
-    sliderRow.className = "slider-row";
-    const range = document.createElement("input");
-    range.type = "range";
-    range.min = "1";
-    range.max = "10";
-    range.step = "1";
-    range.value = "5";
-    range.id = "r_" + cat.key;
-    const num = document.createElement("span");
-    num.className = "score-display";
-    num.textContent = "5";
-    range.addEventListener("input", () => { num.textContent = range.value; });
-    sliderRow.appendChild(range);
-    sliderRow.appendChild(num);
+    const numberRow = buildNumberRow(cat.key);
 
-    item.appendChild(labelRow);
+    const hint = document.createElement("div");
+    hint.className = "scale-hint";
+    hint.innerHTML = "<span>1 = strongly disagree</span><span>10 = strongly agree</span>";
+
+    item.appendChild(catLabel);
     item.appendChild(descP);
-    item.appendChild(sliderRow);
+    item.appendChild(numberRow);
+    item.appendChild(hint);
     form.appendChild(item);
   });
 
@@ -90,7 +130,9 @@ function init() {
 
     const ratings = {};
     CATEGORIES.forEach((cat) => {
-      ratings[cat.key] = Number(document.getElementById("r_" + cat.key).value);
+      if (selections[cat.key] != null) {
+        ratings[cat.key] = selections[cat.key];
+      }
     });
 
     const freeText = document.getElementById("freeText").value.trim();
