@@ -26,6 +26,23 @@ function round1(n) {
   return Math.round(n * 10) / 10;
 }
 
+/** 1 = red, 5 = grey, 10 = green. Accepts any value 1–10 (including fractional averages). */
+function scoreColor(v) {
+  const t = (Math.max(1, Math.min(10, v)) - 1) / 9; // 0 → 1
+  if (t < 0.5) {
+    const p = t / 0.5;
+    const r = Math.round(239 + (161 - 239) * p);
+    const g = Math.round(68 + (161 - 68) * p);
+    const b = Math.round(68 + (161 - 68) * p);
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+  const p = (t - 0.5) / 0.5;
+  const r = Math.round(161 + (74 - 161) * p);
+  const g = Math.round(161 + (222 - 161) * p);
+  const b = Math.round(161 + (128 - 161) * p);
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+
 async function loadDashboard() {
   const gate = document.getElementById("gate");
   const dash = document.getElementById("dashboard");
@@ -73,7 +90,7 @@ async function loadDashboard() {
 
   document.getElementById("overall").innerHTML =
     '<div class="overall-card">' +
-    '<div class="overall-score">' + round1(overallAvg) + "</div>" +
+    '<div class="overall-score" style="color:' + scoreColor(overallAvg) + '">' + round1(overallAvg) + "</div>" +
     '<div class="overall-label">Overall leadership score (1\u201310)</div>' +
     '<div class="response-count">' + n + " response" + (n !== 1 ? "s" : "") + "</div>" +
     "</div>";
@@ -83,13 +100,20 @@ async function loadDashboard() {
     .map((cat) => {
       const maxCount = Math.max(...cat.dist, 1);
       const barsHtml = cat.dist
-        .map((count) => {
+        .map((count, i) => {
           const pct = Math.round((count / maxCount) * 100);
-          const cls = count === 0 ? "hist-bar empty" : "hist-bar";
+          const color = scoreColor(i + 1);
+          if (count === 0) {
+            return (
+              '<div class="hist-col">' +
+              '<div class="hist-bar empty" style="height:2%"></div>' +
+              "</div>"
+            );
+          }
           return (
             '<div class="hist-col">' +
-            (count > 0 ? '<span class="hist-count">' + count + "</span>" : "") +
-            '<div class="' + cls + '" style="height:' + (count === 0 ? 2 : pct) + '%"></div>' +
+            '<span class="hist-count">' + count + "</span>" +
+            '<div class="hist-bar" style="height:' + pct + "%;background:" + color + '"></div>' +
             "</div>"
           );
         })
@@ -104,7 +128,7 @@ async function loadDashboard() {
         '<div class="cat-card">' +
         '<div class="cat-header"><span class="cat-name">' +
         escapeHtml(cat.label) +
-        '</span><span class="cat-avg">avg ' +
+        '</span><span class="cat-avg" style="color:' + scoreColor(cat.avg) + '">avg ' +
         round1(cat.avg) +
         "</span></div>" +
         '<div class="histogram">' + barsHtml + "</div>" +

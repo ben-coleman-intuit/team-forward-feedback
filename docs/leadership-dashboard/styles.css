@@ -99,7 +99,6 @@ h2 {
 .overall-score {
   font-size: 3.5rem;
   font-weight: 800;
-  color: var(--accent);
   line-height: 1.1;
 }
 
@@ -139,7 +138,6 @@ h2 {
 .cat-avg {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--accent);
 }
 
 /* Histogram */
@@ -165,7 +163,6 @@ h2 {
 .hist-bar {
   width: 100%;
   min-height: 0;
-  background: var(--accent);
   border-radius: 3px 3px 0 0;
   transition: height 0.3s ease;
 }
