@@ -5,12 +5,6 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/**
- * Dashboard passphrase — simple client-side gate.
- * The data itself is readable by the anon key (RLS allows SELECT).
- * Change this to something only you know.
- */
-const DASHBOARD_PASSPHRASE = "ben-leadership-2026";
 
 const CATEGORIES = [
   { key: "prioritization", label: "Prioritization & Focus" },
@@ -134,24 +128,4 @@ async function loadDashboard() {
   }
 }
 
-function init() {
-  const btn = document.getElementById("gate-btn");
-  const input = document.getElementById("passphrase");
-
-  function unlock() {
-    const secret = input.value.trim();
-    if (secret !== DASHBOARD_PASSPHRASE) {
-      document.getElementById("gate-msg").textContent = "Wrong passphrase.";
-      document.getElementById("gate-msg").className = "msg error";
-      return;
-    }
-    loadDashboard();
-  }
-
-  btn.addEventListener("click", unlock);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") unlock();
-  });
-}
-
-init();
+loadDashboard();
