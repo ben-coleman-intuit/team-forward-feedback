@@ -44,7 +44,6 @@ function scoreColor(v) {
 }
 
 async function loadDashboard() {
-  const gate = document.getElementById("gate");
   const dash = document.getElementById("dashboard");
   const gateMsg = document.getElementById("gate-msg");
 
@@ -68,7 +67,7 @@ async function loadDashboard() {
     return;
   }
 
-  gate.classList.add("hidden");
+  gateMsg.classList.add("hidden");
   dash.classList.remove("hidden");
 
   const rows = data;
