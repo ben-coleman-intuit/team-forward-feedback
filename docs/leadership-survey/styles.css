@@ -110,9 +110,10 @@ h1 {
 }
 
 .number-box.selected {
-  color: #fff;
+  background: #fafafa;
+  color: #09090b;
   font-weight: 700;
-  border-color: transparent;
+  border-color: #fafafa;
 }
 
 .scale-hint {

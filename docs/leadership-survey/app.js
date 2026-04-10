@@ -46,23 +46,17 @@ function buildNumberRow(catKey) {
     box.textContent = i;
     box.dataset.value = i;
 
-    box.addEventListener("click", () => {
+      box.addEventListener("click", () => {
       if (selections[catKey] === i) {
         delete selections[catKey];
         box.classList.remove("selected");
-        box.style.background = "";
-        box.style.borderColor = "";
         return;
       }
       selections[catKey] = i;
       row.querySelectorAll(".number-box").forEach((b) => {
         b.classList.remove("selected");
-        b.style.background = "";
-        b.style.borderColor = "";
       });
       box.classList.add("selected");
-      box.style.background = scoreColor(i);
-      box.style.borderColor = "transparent";
     });
 
     row.appendChild(box);
