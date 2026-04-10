@@ -1,11 +1,16 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+
+const SUPABASE_URL = "https://kvfdwxitmkshnikgxies.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2ZmR3eGl0bWtzaG5pa2d4aWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1OTU0MjUsImV4cCI6MjA5MTE3MTQyNX0.GQOqK24Nlo54Am7vjqU-nGct2EIkUU_PfTNLEZX8deQ";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 /**
- * Leadership dashboard — fetches data from the same Apps Script (doGet).
- *
- * WEBAPP_URL: same /exec URL as the survey form.
- * DASHBOARD_SECRET: must match the DASHBOARD_SECRET script property in Apps Script.
- *   This protects the GET endpoint so only someone with the passphrase can read results.
+ * Dashboard passphrase — simple client-side gate.
+ * The data itself is readable by the anon key (RLS allows SELECT).
+ * Change this to something only you know.
  */
-const WEBAPP_URL = "REPLACE_ME_WITH_LEADERSHIP_WEBAPP_URL";
+const DASHBOARD_PASSPHRASE = "ben-leadership-2026";
 
 const CATEGORIES = [
   { key: "prioritization", label: "Prioritization & Focus" },
@@ -27,33 +32,26 @@ function round1(n) {
   return Math.round(n * 10) / 10;
 }
 
-async function loadDashboard(secret) {
+async function loadDashboard() {
   const gate = document.getElementById("gate");
   const dash = document.getElementById("dashboard");
   const gateMsg = document.getElementById("gate-msg");
 
-  const url = WEBAPP_URL + "?secret=" + encodeURIComponent(secret);
-
   gateMsg.textContent = "Loading…";
   gateMsg.className = "msg";
 
-  let json;
-  try {
-    const res = await fetch(url);
-    json = await res.json();
-  } catch (err) {
-    gateMsg.textContent = "Could not reach the server. Check WEBAPP_URL in app.js.";
+  const { data, error } = await supabase
+    .from("leadership_responses")
+    .select("id, ratings, free_text, submitted_at")
+    .order("submitted_at", { ascending: false });
+
+  if (error) {
+    gateMsg.textContent = error.message || "Could not load responses.";
     gateMsg.className = "msg error";
     return;
   }
 
-  if (json.error) {
-    gateMsg.textContent = json.error === "unauthorized" ? "Wrong passphrase." : json.error;
-    gateMsg.className = "msg error";
-    return;
-  }
-
-  if (!json.rows || json.rows.length === 0) {
+  if (!data || data.length === 0) {
     gateMsg.textContent = "No responses yet.";
     gateMsg.className = "msg";
     return;
@@ -62,12 +60,13 @@ async function loadDashboard(secret) {
   gate.classList.add("hidden");
   dash.classList.remove("hidden");
 
-  const rows = json.rows;
+  const rows = data;
   const n = rows.length;
 
-  // Compute per-category stats
   const stats = CATEGORIES.map((cat) => {
-    const values = rows.map((r) => Number(r[cat.key]) || 0).filter((v) => v >= 1 && v <= 10);
+    const values = rows
+      .map((r) => Number(r.ratings && r.ratings[cat.key]) || 0)
+      .filter((v) => v >= 1 && v <= 10);
     const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
     const dist = Array(10).fill(0);
     values.forEach((v) => { dist[v - 1]++; });
@@ -78,15 +77,13 @@ async function loadDashboard(secret) {
     ? stats.reduce((s, c) => s + c.avg, 0) / stats.length
     : 0;
 
-  // Overall card
   document.getElementById("overall").innerHTML =
     '<div class="overall-card">' +
     '<div class="overall-score">' + round1(overallAvg) + "</div>" +
-    '<div class="overall-label">Overall leadership score (1–10)</div>' +
+    '<div class="overall-label">Overall leadership score (1\u201310)</div>' +
     '<div class="response-count">' + n + " response" + (n !== 1 ? "s" : "") + "</div>" +
     "</div>";
 
-  // Category cards with distribution
   const catContainer = document.getElementById("categories");
   catContainer.innerHTML = stats
     .map((cat) => {
@@ -117,7 +114,6 @@ async function loadDashboard(secret) {
     })
     .join("");
 
-  // Free-text responses
   const texts = rows
     .map((r) => (r.free_text || "").trim())
     .filter((t) => t.length > 0);
@@ -133,20 +129,17 @@ async function loadDashboard(secret) {
 }
 
 function init() {
-  if (!WEBAPP_URL || WEBAPP_URL.indexOf("REPLACE_ME") !== -1) {
-    document.getElementById("gate-msg").textContent =
-      "Set WEBAPP_URL in leadership-dashboard/app.js.";
-    document.getElementById("gate-msg").className = "msg error";
-    return;
-  }
-
   const btn = document.getElementById("gate-btn");
   const input = document.getElementById("passphrase");
 
   function unlock() {
     const secret = input.value.trim();
-    if (!secret) return;
-    loadDashboard(secret);
+    if (secret !== DASHBOARD_PASSPHRASE) {
+      document.getElementById("gate-msg").textContent = "Wrong passphrase.";
+      document.getElementById("gate-msg").className = "msg error";
+      return;
+    }
+    loadDashboard();
   }
 
   btn.addEventListener("click", unlock);

@@ -1,9 +1,9 @@
-/**
- * Anonymous leadership survey → Google Apps Script → Google Sheet.
- *
- * Replace the URL below with your deployed Web App URL (ends in /exec).
- */
-const WEBAPP_URL = "REPLACE_ME_WITH_LEADERSHIP_WEBAPP_URL";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+
+const SUPABASE_URL = "https://kvfdwxitmkshnikgxies.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2ZmR3eGl0bWtzaG5pa2d4aWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1OTU0MjUsImV4cCI6MjA5MTE3MTQyNX0.GQOqK24Nlo54Am7vjqU-nGct2EIkUU_PfTNLEZX8deQ";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const CATEGORIES = [
   { key: "prioritization", label: "Prioritization & Focus", desc: "Helps the team focus on what matters most" },
@@ -20,13 +20,6 @@ const CATEGORIES = [
 function init() {
   const formRoot = document.getElementById("form-root");
   const done = document.getElementById("done");
-  const warning = document.getElementById("config-warning");
-
-  if (!WEBAPP_URL || WEBAPP_URL.indexOf("REPLACE_ME") !== -1) {
-    warning.classList.remove("hidden");
-    warning.textContent = "Set WEBAPP_URL in leadership-survey/app.js to your deployed Apps Script URL.";
-    return;
-  }
 
   const form = document.createElement("form");
   form.className = "stack";
@@ -41,10 +34,13 @@ function init() {
     const catLabel = document.createElement("span");
     catLabel.className = "cat-label";
     catLabel.textContent = cat.label;
-    const catDesc = document.createElement("span");
-    catDesc.className = "cat-desc";
-    catDesc.textContent = cat.desc;
     labelRow.appendChild(catLabel);
+
+    const descP = document.createElement("p");
+    descP.style.margin = "0";
+    descP.style.fontSize = "0.8rem";
+    descP.style.color = "#a1a1aa";
+    descP.textContent = cat.desc;
 
     const sliderRow = document.createElement("div");
     sliderRow.className = "slider-row";
@@ -63,11 +59,6 @@ function init() {
     sliderRow.appendChild(num);
 
     item.appendChild(labelRow);
-    const descP = document.createElement("p");
-    descP.style.margin = "0";
-    descP.style.fontSize = "0.8rem";
-    descP.style.color = "#a1a1aa";
-    descP.textContent = cat.desc;
     item.appendChild(descP);
     item.appendChild(sliderRow);
     form.appendChild(item);
@@ -91,62 +82,33 @@ function init() {
   form.appendChild(msg);
   formRoot.appendChild(form);
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     btn.disabled = true;
     msg.textContent = "Submitting…";
     msg.className = "msg";
 
-    const payload = {};
+    const ratings = {};
     CATEGORIES.forEach((cat) => {
-      payload[cat.key] = document.getElementById("r_" + cat.key).value;
+      ratings[cat.key] = Number(document.getElementById("r_" + cat.key).value);
     });
-    payload.free_text = document.getElementById("freeText").value.trim();
 
-    const timeout = setTimeout(() => {
-      window.removeEventListener("message", onMessage);
-      msg.textContent = "Timed out — please try again.";
+    const freeText = document.getElementById("freeText").value.trim();
+
+    const { error } = await supabase.from("leadership_responses").insert({
+      ratings,
+      free_text: freeText || null,
+    });
+
+    if (error) {
+      msg.textContent = error.message || "Submit failed — please try again.";
       msg.className = "msg error";
       btn.disabled = false;
-    }, 25000);
-
-    function onMessage(ev) {
-      if (!ev.data || ev.data.type !== "leadership-survey") return;
-      if (
-        typeof ev.origin !== "string" ||
-        (ev.origin.indexOf("script.google.com") === -1 &&
-          ev.origin.indexOf("googleusercontent.com") === -1)
-      ) return;
-      clearTimeout(timeout);
-      window.removeEventListener("message", onMessage);
-      if (ev.data.ok) {
-        formRoot.classList.add("hidden");
-        done.classList.remove("hidden");
-      } else {
-        msg.textContent = "Something went wrong. Please try again.";
-        msg.className = "msg error";
-        btn.disabled = false;
-      }
-    }
-    window.addEventListener("message", onMessage);
-
-    const hiddenForm = document.createElement("form");
-    hiddenForm.method = "POST";
-    hiddenForm.action = WEBAPP_URL;
-    hiddenForm.target = "sheet-iframe";
-    hiddenForm.style.display = "none";
-
-    for (const [k, v] of Object.entries(payload)) {
-      const inp = document.createElement("input");
-      inp.type = "hidden";
-      inp.name = k;
-      inp.value = String(v ?? "");
-      hiddenForm.appendChild(inp);
+      return;
     }
 
-    document.body.appendChild(hiddenForm);
-    hiddenForm.submit();
-    document.body.removeChild(hiddenForm);
+    formRoot.classList.add("hidden");
+    done.classList.remove("hidden");
   });
 }
 
