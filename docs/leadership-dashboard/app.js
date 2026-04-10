@@ -88,27 +88,33 @@ async function loadDashboard() {
   catContainer.innerHTML = stats
     .map((cat) => {
       const maxCount = Math.max(...cat.dist, 1);
-      const distHtml = cat.dist
-        .map((count, i) => {
-          const pct = (count / maxCount) * 100;
+      const barsHtml = cat.dist
+        .map((count) => {
+          const pct = Math.round((count / maxCount) * 100);
+          const cls = count === 0 ? "hist-bar empty" : "hist-bar";
           return (
-            '<div class="dist-row">' +
-            '<span class="dist-label">' + (i + 1) + "</span>" +
-            '<div class="dist-bar-bg"><div class="dist-bar" style="width:' + pct + '%"></div></div>' +
-            '<span class="dist-count">' + count + "</span>" +
+            '<div class="hist-col">' +
+            (count > 0 ? '<span class="hist-count">' + count + "</span>" : "") +
+            '<div class="' + cls + '" style="height:' + (count === 0 ? 2 : pct) + '%"></div>' +
             "</div>"
           );
         })
         .join("");
 
+      const labelsHtml =
+        '<div class="hist-labels">' +
+        Array.from({ length: 10 }, (_, i) => "<span>" + (i + 1) + "</span>").join("") +
+        "</div>";
+
       return (
         '<div class="cat-card">' +
         '<div class="cat-header"><span class="cat-name">' +
         escapeHtml(cat.label) +
-        '</span><span class="cat-avg">' +
+        '</span><span class="cat-avg">avg ' +
         round1(cat.avg) +
         "</span></div>" +
-        distHtml +
+        '<div class="histogram">' + barsHtml + "</div>" +
+        labelsHtml +
         "</div>"
       );
     })
