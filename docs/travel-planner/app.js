@@ -56,6 +56,15 @@ const SCENARIOS = [
       return "managers";
     },
   },
+  {
+    id: "mgrs_visit_teams_ex_israel",
+    label: "All managers visit teams (ex Israel)",
+    desc: "Every US-based manager travels to where their team is (TLV excluded)",
+    who: (geo) => {
+      if (geo.key === "tlv") return false;
+      return "managers";
+    },
+  },
 ];
 
 let activeScenario = null;
