@@ -1,24 +1,29 @@
 const GEOS = [
   { key: "mtv", label: "MTV", isDestination: true },
+  { key: "mtv_mgr", label: "MTV — Mgrs w/ remote DR" },
   { key: "west", label: "West Coast" },
   { key: "central", label: "Central" },
   { key: "east", label: "East Coast" },
   { key: "nyc", label: "NYC" },
   { key: "tlv", label: "TLV (Israel)" },
+  { key: "tlv_mgr", label: "TLV — Managers" },
 ];
+
+const MTV_LOCAL = new Set(["mtv", "mtv_mgr"]);
+const TLV_ALL = new Set(["tlv", "tlv_mgr"]);
 
 const SCENARIOS = [
   {
     id: "all_mtv",
     label: "All team to MTV",
-    desc: "Everyone flies to Mountain View (including TLV)",
-    traveling: (geo) => geo.key !== "mtv",
+    desc: "Everyone flies to Mountain View (including TLV + TLV managers)",
+    traveling: (geo) => !MTV_LOCAL.has(geo.key),
   },
   {
     id: "all_mtv_ex_israel",
     label: "All team to MTV (ex Israel)",
-    desc: "Everyone except TLV flies to Mountain View",
-    traveling: (geo) => geo.key !== "mtv" && geo.key !== "tlv",
+    desc: "Everyone except TLV and TLV managers flies to Mountain View",
+    traveling: (geo) => !MTV_LOCAL.has(geo.key) && !TLV_ALL.has(geo.key),
   },
   {
     id: "west_central_mtv",
