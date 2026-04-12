@@ -32,10 +32,10 @@ const SCENARIOS = [
     traveling: (geo) => geo.key === "west" || geo.key === "central" || geo.key === "mtv_mgr" || geo.key === "east",
   },
   {
-    id: "east_nyc",
-    label: "East Coast team to NYC",
-    desc: "Only East Coast (non-NYC) travels to New York",
-    traveling: (geo) => geo.key === "east",
+    id: "all_mtv_plus_tlv_mgr",
+    label: "All team to MTV + Israel managers",
+    desc: "Everyone except TLV ICs flies to Mountain View; TLV managers included",
+    traveling: (geo) => !MTV_LOCAL.has(geo.key) && geo.key !== "tlv",
   },
 ];
 
