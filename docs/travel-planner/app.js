@@ -29,7 +29,7 @@ const SCENARIOS = [
     id: "west_central_mtv_mgr_nyc",
     label: "West Coast + Central to MTV / remote managers to NYC",
     desc: "West Coast and Central travel to MTV; MTV managers w/ remote DR travel to NYC",
-    traveling: (geo) => geo.key === "west" || geo.key === "central" || geo.key === "mtv_mgr",
+    traveling: (geo) => geo.key === "west" || geo.key === "central" || geo.key === "mtv_mgr" || geo.key === "east",
   },
   {
     id: "east_nyc",
