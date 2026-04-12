@@ -26,10 +26,10 @@ const SCENARIOS = [
     traveling: (geo) => !MTV_LOCAL.has(geo.key) && !TLV_ALL.has(geo.key),
   },
   {
-    id: "west_central_mtv",
-    label: "West Coast + Central to MTV",
-    desc: "Only West Coast and Central geos travel to MTV",
-    traveling: (geo) => geo.key === "west" || geo.key === "central",
+    id: "west_central_mtv_mgr_nyc",
+    label: "West Coast + Central to MTV / remote managers to NYC",
+    desc: "West Coast and Central travel to MTV; MTV managers w/ remote DR travel to NYC",
+    traveling: (geo) => geo.key === "west" || geo.key === "central" || geo.key === "mtv_mgr",
   },
   {
     id: "east_nyc",
