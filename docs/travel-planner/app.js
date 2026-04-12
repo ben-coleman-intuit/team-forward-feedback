@@ -47,6 +47,15 @@ const SCENARIOS = [
     desc: "Only managers from each geo travel to Mountain View (no ICs)",
     who: (geo) => geo.key === "mtv" ? false : "managers",
   },
+  {
+    id: "us_managers_mtv",
+    label: "Only US-based managers to MTV",
+    desc: "Managers from US geos travel to MTV (TLV excluded)",
+    who: (geo) => {
+      if (geo.key === "mtv" || geo.key === "tlv") return false;
+      return "managers";
+    },
+  },
 ];
 
 let activeScenario = null;
