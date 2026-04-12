@@ -1,5 +1,5 @@
 const GEOS = [
-  { key: "mtv", label: "MTV", isDestination: true, defaultCost: 0, defaultHC: 0, defaultMgr: 5 },
+  { key: "mtv", label: "MTV", isDestination: true, defaultCost: 3400, defaultHC: 0, defaultMgr: 5 },
   { key: "west", label: "West Coast", defaultCost: 1600, defaultHC: 8, defaultMgr: 0 },
   { key: "central", label: "Central", defaultCost: 2900, defaultHC: 8, defaultMgr: 0 },
   { key: "east", label: "East Coast", defaultCost: 3400, defaultHC: 3, defaultMgr: 0 },
