@@ -1,12 +1,12 @@
 const GEOS = [
-  { key: "mtv", label: "MTV", isDestination: true },
-  { key: "mtv_mgr", label: "MTV — Mgrs w/ remote DR" },
-  { key: "west", label: "West Coast" },
-  { key: "central", label: "Central" },
-  { key: "east", label: "East Coast" },
-  { key: "nyc", label: "NYC" },
-  { key: "tlv", label: "TLV (Israel)" },
-  { key: "tlv_mgr", label: "TLV — Managers" },
+  { key: "mtv", label: "MTV", isDestination: true, defaultCost: 0 },
+  { key: "mtv_mgr", label: "MTV — Mgrs w/ remote DR", defaultCost: 3400 },
+  { key: "west", label: "West Coast", defaultCost: 1600 },
+  { key: "central", label: "Central", defaultCost: 2900 },
+  { key: "east", label: "East Coast", defaultCost: 3400 },
+  { key: "nyc", label: "NYC", defaultCost: 3400 },
+  { key: "tlv", label: "TLV (Israel)", defaultCost: 17000 },
+  { key: "tlv_mgr", label: "TLV — Managers", defaultCost: 17000 },
 ];
 
 const MTV_LOCAL = new Set(["mtv", "mtv_mgr"]);
@@ -115,7 +115,7 @@ function init() {
       "<div>" +
       "<label>Cost per person (3 days)</label>" +
       '<div class="dollar-input"><span class="dollar-sign">$</span>' +
-      '<input type="number" id="cost_' + geo.key + '" min="0" value="0" step="100" />' +
+      '<input type="number" id="cost_' + geo.key + '" min="0" value="' + (geo.defaultCost || 0) + '" step="100" />' +
       "</div></div>";
     grid.appendChild(card);
   });
