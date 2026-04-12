@@ -114,8 +114,9 @@ function init() {
       "</div>" +
       "<div>" +
       "<label>Cost per person (3 days)</label>" +
-      '<input type="number" id="cost_' + geo.key + '" min="0" value="0" step="100" placeholder="$" />' +
-      "</div>";
+      '<div class="dollar-input"><span class="dollar-sign">$</span>' +
+      '<input type="number" id="cost_' + geo.key + '" min="0" value="0" step="100" />' +
+      "</div></div>";
     grid.appendChild(card);
   });
 
