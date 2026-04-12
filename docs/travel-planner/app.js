@@ -1,41 +1,51 @@
 const GEOS = [
-  { key: "mtv", label: "MTV", isDestination: true, defaultCost: 0, defaultHC: 0 },
-  { key: "mtv_mgr", label: "MTV — Mgrs w/ remote DR", defaultCost: 3400, defaultHC: 5 },
-  { key: "west", label: "West Coast", defaultCost: 1600, defaultHC: 8 },
-  { key: "central", label: "Central", defaultCost: 2900, defaultHC: 8 },
-  { key: "east", label: "East Coast", defaultCost: 3400, defaultHC: 3 },
-  { key: "nyc", label: "NYC", defaultCost: 3400, defaultHC: 12 },
-  { key: "tlv", label: "TLV (Israel)", defaultCost: 17000, defaultHC: 15 },
-  { key: "tlv_mgr", label: "TLV — Managers", defaultCost: 17000, defaultHC: 5 },
+  { key: "mtv", label: "MTV", isDestination: true, defaultCost: 0, defaultHC: 0, defaultMgr: 5 },
+  { key: "west", label: "West Coast", defaultCost: 1600, defaultHC: 8, defaultMgr: 0 },
+  { key: "central", label: "Central", defaultCost: 2900, defaultHC: 8, defaultMgr: 0 },
+  { key: "east", label: "East Coast", defaultCost: 3400, defaultHC: 3, defaultMgr: 0 },
+  { key: "nyc", label: "NYC", defaultCost: 3400, defaultHC: 12, defaultMgr: 0 },
+  { key: "tlv", label: "TLV (Israel)", defaultCost: 17000, defaultHC: 15, defaultMgr: 5 },
 ];
 
-const MTV_LOCAL = new Set(["mtv", "mtv_mgr"]);
-const TLV_ALL = new Set(["tlv", "tlv_mgr"]);
-
+// Each scenario returns "all" | "managers" | false per geo
 const SCENARIOS = [
   {
     id: "all_mtv",
     label: "All team to MTV",
-    desc: "Everyone flies to Mountain View (including TLV + TLV managers)",
-    traveling: (geo) => !MTV_LOCAL.has(geo.key),
+    desc: "Everyone (ICs + managers) flies to Mountain View, including TLV",
+    who: (geo) => geo.key === "mtv" ? false : "all",
   },
   {
     id: "all_mtv_ex_israel",
     label: "All team to MTV (ex Israel)",
-    desc: "Everyone except TLV and TLV managers flies to Mountain View",
-    traveling: (geo) => !MTV_LOCAL.has(geo.key) && !TLV_ALL.has(geo.key),
+    desc: "Everyone except TLV flies to Mountain View",
+    who: (geo) => (geo.key === "mtv" || geo.key === "tlv") ? false : "all",
   },
   {
-    id: "west_central_mtv_mgr_nyc",
-    label: "West Coast + Central to MTV / remote managers to NYC",
-    desc: "West Coast and Central travel to MTV; MTV managers w/ remote DR travel to NYC",
-    traveling: (geo) => geo.key === "west" || geo.key === "central" || geo.key === "mtv_mgr" || geo.key === "east",
+    id: "west_central_east_mtv_mgr_nyc",
+    label: "West Coast + Central + East to MTV / MTV managers to NYC",
+    desc: "West Coast, Central, and East Coast travel to MTV; MTV managers travel to NYC",
+    who: (geo) => {
+      if (geo.key === "west" || geo.key === "central" || geo.key === "east") return "all";
+      if (geo.key === "mtv") return "managers";
+      return false;
+    },
   },
   {
     id: "all_mtv_plus_tlv_mgr",
     label: "All team to MTV + Israel managers",
     desc: "Everyone except TLV ICs flies to Mountain View; TLV managers included",
-    traveling: (geo) => !MTV_LOCAL.has(geo.key) && geo.key !== "tlv",
+    who: (geo) => {
+      if (geo.key === "mtv") return false;
+      if (geo.key === "tlv") return "managers";
+      return "all";
+    },
+  },
+  {
+    id: "managers_only_mtv",
+    label: "Only managers to MTV",
+    desc: "Only managers from each geo travel to Mountain View (no ICs)",
+    who: (geo) => geo.key === "mtv" ? false : "managers",
   },
 ];
 
@@ -67,15 +77,25 @@ function calculate() {
   const lines = [];
 
   GEOS.forEach((geo) => {
-    const headcount = getVal("hc_" + geo.key);
+    const hc = getVal("hc_" + geo.key);
+    const mgr = getVal("mgr_" + geo.key);
     const cost = getVal("cost_" + geo.key);
-    if (scenario.traveling(geo) && headcount > 0) {
-      const lineCost = headcount * cost;
+    const group = scenario.who(geo);
+
+    let travelers = 0;
+    let label = "";
+    if (group === "all") {
+      travelers = hc + mgr;
+      label = geo.label + " — all (" + travelers + " x " + fmt(cost) + ")";
+    } else if (group === "managers") {
+      travelers = mgr;
+      label = geo.label + " — managers (" + travelers + " x " + fmt(cost) + ")";
+    }
+
+    if (travelers > 0) {
+      const lineCost = travelers * cost;
       total += lineCost;
-      lines.push({
-        label: geo.label + " (" + headcount + " x " + fmt(cost) + ")",
-        cost: lineCost,
-      });
+      lines.push({ label, cost: lineCost });
     }
   });
 
@@ -109,11 +129,15 @@ function init() {
     card.innerHTML =
       '<div class="geo-name">' + geo.label + "</div>" +
       "<div>" +
-      "<label>Headcount</label>" +
+      "<label>ICs</label>" +
       '<input type="number" id="hc_' + geo.key + '" min="0" value="' + (geo.defaultHC || 0) + '" />' +
       "</div>" +
       "<div>" +
-      "<label>Cost per person (3 days)</label>" +
+      "<label>Managers</label>" +
+      '<input type="number" id="mgr_' + geo.key + '" min="0" value="' + (geo.defaultMgr || 0) + '" />' +
+      "</div>" +
+      "<div>" +
+      "<label>Cost / person (3 days)</label>" +
       '<div class="dollar-input"><span class="dollar-sign">$</span>' +
       '<input type="number" id="cost_' + geo.key + '" min="0" value="' + (geo.defaultCost || 0) + '" step="100" />' +
       "</div></div>";
