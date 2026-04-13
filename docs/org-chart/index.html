@@ -13,13 +13,53 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        gap: 2rem;
       }
       @media print { body { padding: 0.5in; } }
       svg { max-width: 100%; height: auto; }
+      .callout {
+        width: 960px;
+        max-width: 100%;
+        display: flex;
+        gap: 1rem;
+      }
+      .callout-card {
+        flex: 1;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px 18px;
+        background: #f8fafc;
+      }
+      .callout-card h3 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .callout-card h3 .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .callout-card ul {
+        margin: 0;
+        padding: 0 0 0 18px;
+        font-size: 12px;
+        color: #475569;
+        line-height: 1.6;
+      }
+      .callout-card .arrow {
+        font-weight: 600;
+        color: #94a3b8;
+      }
     </style>
   </head>
   <body>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" width="960" height="460">
       <defs>
         <filter id="shadow" x="-4%" y="-4%" width="108%" height="116%">
           <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.08"/>
@@ -32,35 +72,21 @@
         <path d="M480,42 L480,70"/>
         <!-- CEO → CTO -->
         <path d="M480,112 L480,130 L170,130 L170,160"/>
-        <!-- CEO → Consumer Products -->
-        <path d="M480,112 L480,130 L370,130 L370,160"/>
-        <!-- CEO → Business Products -->
+        <!-- CEO → Consumer Products Chief -->
+        <path d="M480,112 L480,130 L380,130 L380,160"/>
+        <!-- CEO → Business Products Chief -->
         <path d="M480,112 L480,130 L590,130 L590,160"/>
         <!-- CEO → Legal -->
         <path d="M480,112 L480,130 L790,130 L790,160"/>
         <!-- CTO → Fintech GM -->
         <path d="M170,202 L170,230 L120,230 L120,260"/>
         <!-- CTO → Trust & Safety -->
-        <path d="M170,202 L170,230 L270,230 L270,260"/>
+        <path d="M170,202 L170,230 L290,230 L290,260"/>
         <!-- Legal → Compliance -->
         <path d="M790,202 L790,362"/>
         <!-- Fintech GM → CRO -->
         <path d="M120,302 L120,360"/>
       </g>
-
-      <!-- DOTTED LINES (CRO relationships) -->
-      <g stroke="#0ea5e9" stroke-width="2" stroke-dasharray="6,4" fill="none">
-        <!-- CRO → Trust & Safety -->
-        <path d="M170,380 C300,380 270,302 270,302"/>
-        <!-- CRO → Compliance -->
-        <path d="M170,382 C480,440 700,382 730,382"/>
-      </g>
-
-      <!-- QUARTERLY LINE (CRO → Board) -->
-      <path d="M60,380 C-10,380 -10,22 430,22"
-            stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,4" fill="none"/>
-      <text x="8" y="210" fill="#f59e0b" font-size="11" font-family="system-ui, sans-serif"
-            transform="rotate(-90,8,210)" text-anchor="middle">Quarterly report</text>
 
       <!-- BOXES -->
       <!-- Board -->
@@ -75,15 +101,15 @@
       <rect x="110" y="162" width="120" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
       <text x="170" y="187" text-anchor="middle" fill="#334155" font-size="13" font-weight="600" font-family="system-ui, sans-serif">CTO</text>
 
-      <!-- Consumer Products -->
-      <rect x="300" y="162" width="140" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
-      <text x="370" y="180" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Consumer</text>
-      <text x="370" y="195" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Products</text>
+      <!-- Consumer Products Chief -->
+      <rect x="300" y="162" width="160" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="380" y="180" text-anchor="middle" fill="#334155" font-size="11" font-weight="600" font-family="system-ui, sans-serif">Consumer Products</text>
+      <text x="380" y="195" text-anchor="middle" fill="#334155" font-size="11" font-weight="600" font-family="system-ui, sans-serif">Chief</text>
 
-      <!-- Business Products -->
-      <rect x="520" y="162" width="140" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
-      <text x="590" y="180" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Business</text>
-      <text x="590" y="195" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Products</text>
+      <!-- Business Products Chief -->
+      <rect x="510" y="162" width="160" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="590" y="180" text-anchor="middle" fill="#334155" font-size="11" font-weight="600" font-family="system-ui, sans-serif">Business Products</text>
+      <text x="590" y="195" text-anchor="middle" fill="#334155" font-size="11" font-weight="600" font-family="system-ui, sans-serif">Chief</text>
 
       <!-- Legal -->
       <rect x="730" y="162" width="120" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
@@ -94,9 +120,9 @@
       <text x="120" y="287" text-anchor="middle" fill="#334155" font-size="13" font-weight="600" font-family="system-ui, sans-serif">Fintech GM</text>
 
       <!-- Trust & Safety -->
-      <rect x="205" y="262" width="130" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
-      <text x="270" y="280" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Trust &amp;</text>
-      <text x="270" y="295" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Safety</text>
+      <rect x="220" y="262" width="140" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="290" y="280" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Trust &amp;</text>
+      <text x="290" y="295" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Safety</text>
 
       <!-- Compliance -->
       <rect x="730" y="362" width="120" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
@@ -106,17 +132,35 @@
       <rect x="60" y="362" width="120" height="40" rx="6" fill="#0c4a6e" filter="url(#shadow)"/>
       <text x="120" y="387" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="system-ui, sans-serif">CRO</text>
 
-      <!-- LEGEND -->
-      <g transform="translate(250,520)">
+      <!-- Simple legend for reporting lines only -->
+      <g transform="translate(380,430)">
         <line x1="0" y1="0" x2="30" y2="0" stroke="#94a3b8" stroke-width="2"/>
-        <text x="36" y="4" fill="#64748b" font-size="11" font-family="system-ui, sans-serif">Direct report</text>
-
-        <line x1="160" y1="0" x2="190" y2="0" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="6,4"/>
-        <text x="196" y="4" fill="#64748b" font-size="11" font-family="system-ui, sans-serif">Dotted-line relationship</text>
-
-        <line x1="380" y1="0" x2="410" y2="0" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,4"/>
-        <text x="416" y="4" fill="#64748b" font-size="11" font-family="system-ui, sans-serif">Quarterly board report</text>
+        <text x="36" y="4" fill="#64748b" font-size="11" font-family="system-ui, sans-serif">Direct reporting line</text>
       </g>
     </svg>
+
+    <!-- CRO RELATIONSHIP CALLOUT CARDS -->
+    <div class="callout">
+      <div class="callout-card">
+        <h3><span class="dot" style="background:#f59e0b"></span>Board reporting</h3>
+        <ul>
+          <li>Quarterly risk report <span class="arrow">→</span> Board</li>
+        </ul>
+      </div>
+      <div class="callout-card">
+        <h3><span class="dot" style="background:#8b5cf6"></span>Stakeholder reporting</h3>
+        <ul>
+          <li>Risk enablement updates <span class="arrow">→</span> Consumer Products Chief</li>
+          <li>Risk enablement updates <span class="arrow">→</span> Business Products Chief</li>
+        </ul>
+      </div>
+      <div class="callout-card">
+        <h3><span class="dot" style="background:#0ea5e9"></span>Operational partnership</h3>
+        <ul>
+          <li>Standards &amp; execution <span class="arrow">↔</span> Compliance</li>
+          <li>Threat response &amp; capabilities <span class="arrow">↔</span> Trust &amp; Safety</li>
+        </ul>
+      </div>
+    </div>
   </body>
 </html>
