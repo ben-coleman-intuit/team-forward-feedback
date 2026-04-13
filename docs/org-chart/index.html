@@ -5,225 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Org chart</title>
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-
       body {
         font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         background: #fff;
-        color: #1a1a1a;
+        margin: 0;
         padding: 2rem;
-      }
-
-      @media print {
-        body { padding: 0.5in; }
-      }
-
-      .chart {
-        position: relative;
-        width: 960px;
-        margin: 0 auto;
-      }
-
-      .box {
-        position: absolute;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: 6px;
-        padding: 8px 14px;
-        white-space: nowrap;
-        line-height: 1.3;
       }
-
-      .box.primary {
-        background: #1e293b;
-        color: #fff;
-        border: 2px solid #1e293b;
-      }
-
-      .box.secondary {
-        background: #f1f5f9;
-        color: #334155;
-        border: 2px solid #cbd5e1;
-      }
-
-      .box.highlight {
-        background: #0c4a6e;
-        color: #fff;
-        border: 2px solid #0c4a6e;
-      }
-
-      svg.lines {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-      }
-
-      .legend {
-        display: flex;
-        gap: 2rem;
-        justify-content: center;
-        margin-top: 1rem;
-        font-size: 12px;
-        color: #64748b;
-      }
-
-      .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .legend-line {
-        width: 30px;
-        height: 0;
-      }
-
-      .legend-line.solid {
-        border-top: 2px solid #94a3b8;
-      }
-
-      .legend-line.dotted {
-        border-top: 2px dashed #0ea5e9;
-      }
-
-      .legend-line.quarterly {
-        border-top: 2px dashed #f59e0b;
-      }
+      @media print { body { padding: 0.5in; } }
+      svg { max-width: 100%; height: auto; }
     </style>
   </head>
   <body>
-    <div class="chart" id="chart"></div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-line solid"></div> Direct report</div>
-      <div class="legend-item"><div class="legend-line dotted"></div> Dotted-line relationship</div>
-      <div class="legend-item"><div class="legend-line quarterly"></div> Quarterly board report</div>
-    </div>
-    <script>
-      const NODES = [
-        { id: "board",       label: "Board",                x: 430, y: 0,   style: "primary", w: 100 },
-        { id: "ceo",         label: "CEO",                  x: 430, y: 80,  style: "primary", w: 100 },
-        { id: "cto",         label: "CTO",                  x: 120, y: 180, style: "secondary", w: 100 },
-        { id: "consumer",    label: "Consumer\nProducts",    x: 310, y: 180, style: "secondary", w: 120 },
-        { id: "business",    label: "Business\nProducts",    x: 510, y: 180, style: "secondary", w: 120 },
-        { id: "legal",       label: "Legal",                x: 720, y: 180, style: "secondary", w: 100 },
-        { id: "fintech",     label: "Fintech GM",           x: 60,  y: 300, style: "secondary", w: 110 },
-        { id: "trust",       label: "Trust &\nSafety",      x: 210, y: 300, style: "secondary", w: 100 },
-        { id: "compliance",  label: "Compliance",           x: 720, y: 300, style: "secondary", w: 110 },
-        { id: "cro",         label: "CRO",                  x: 60,  y: 420, style: "highlight", w: 100 },
-      ];
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560">
+      <defs>
+        <filter id="shadow" x="-4%" y="-4%" width="108%" height="116%">
+          <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.08"/>
+        </filter>
+      </defs>
 
-      const SOLID_LINES = [
-        ["board", "ceo"],
-        ["ceo", "cto"],
-        ["ceo", "consumer"],
-        ["ceo", "business"],
-        ["ceo", "legal"],
-        ["cto", "fintech"],
-        ["cto", "trust"],
-        ["legal", "compliance"],
-        ["fintech", "cro"],
-      ];
+      <!-- SOLID LINES (reporting) -->
+      <g stroke="#94a3b8" stroke-width="2" fill="none">
+        <!-- Board → CEO -->
+        <path d="M480,42 L480,70"/>
+        <!-- CEO → CTO -->
+        <path d="M480,112 L480,130 L170,130 L170,160"/>
+        <!-- CEO → Consumer Products -->
+        <path d="M480,112 L480,130 L370,130 L370,160"/>
+        <!-- CEO → Business Products -->
+        <path d="M480,112 L480,130 L590,130 L590,160"/>
+        <!-- CEO → Legal -->
+        <path d="M480,112 L480,130 L790,130 L790,160"/>
+        <!-- CTO → Fintech GM -->
+        <path d="M170,202 L170,230 L120,230 L120,260"/>
+        <!-- CTO → Trust & Safety -->
+        <path d="M170,202 L170,230 L270,230 L270,260"/>
+        <!-- Legal → Compliance -->
+        <path d="M790,202 L790,260"/>
+        <!-- Fintech GM → CRO -->
+        <path d="M120,302 L120,360"/>
+      </g>
 
-      const DOTTED_LINES = [
-        { from: "cro", to: "trust", color: "#0ea5e9" },
-        { from: "cro", to: "compliance", color: "#0ea5e9" },
-      ];
+      <!-- DOTTED LINES (CRO relationships) -->
+      <g stroke="#0ea5e9" stroke-width="2" stroke-dasharray="6,4" fill="none">
+        <!-- CRO → Trust & Safety -->
+        <path d="M170,380 C300,380 270,302 270,302"/>
+        <!-- CRO → Compliance -->
+        <path d="M170,380 C480,430 790,340 790,302"/>
+      </g>
 
-      const QUARTERLY_LINE = { from: "cro", to: "board", color: "#f59e0b" };
+      <!-- QUARTERLY LINE (CRO → Board) -->
+      <path d="M60,380 C-10,380 -10,22 430,22"
+            stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,4" fill="none"/>
+      <text x="8" y="210" fill="#f59e0b" font-size="11" font-family="system-ui, sans-serif"
+            transform="rotate(-90,8,210)" text-anchor="middle">Quarterly report</text>
 
-      const chart = document.getElementById("chart");
-      const H = 40;
+      <!-- BOXES -->
+      <!-- Board -->
+      <rect x="430" y="2" width="100" height="40" rx="6" fill="#1e293b" filter="url(#shadow)"/>
+      <text x="480" y="27" text-anchor="middle" fill="#fff" font-size="13" font-weight="600" font-family="system-ui, sans-serif">Board</text>
 
-      // Render boxes
-      NODES.forEach((n) => {
-        const div = document.createElement("div");
-        div.className = "box " + n.style;
-        div.id = "node-" + n.id;
-        div.style.left = n.x + "px";
-        div.style.top = n.y + "px";
-        div.style.width = n.w + "px";
-        div.style.height = H + "px";
-        div.innerHTML = n.label.replace(/\n/g, "<br>");
-        chart.appendChild(div);
-      });
+      <!-- CEO -->
+      <rect x="430" y="72" width="100" height="40" rx="6" fill="#1e293b" filter="url(#shadow)"/>
+      <text x="480" y="97" text-anchor="middle" fill="#fff" font-size="13" font-weight="600" font-family="system-ui, sans-serif">CEO</text>
 
-      // Compute chart height
-      const maxY = Math.max(...NODES.map((n) => n.y)) + H + 40;
-      chart.style.height = maxY + "px";
+      <!-- CTO -->
+      <rect x="110" y="162" width="120" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="170" y="187" text-anchor="middle" fill="#334155" font-size="13" font-weight="600" font-family="system-ui, sans-serif">CTO</text>
 
-      function cx(n) { return n.x + n.w / 2; }
-      function top(n) { return n.y; }
-      function bot(n) { return n.y + H; }
+      <!-- Consumer Products -->
+      <rect x="300" y="162" width="140" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="370" y="180" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Consumer</text>
+      <text x="370" y="195" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Products</text>
 
-      function nodeById(id) { return NODES.find((n) => n.id === id); }
+      <!-- Business Products -->
+      <rect x="520" y="162" width="140" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="590" y="180" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Business</text>
+      <text x="590" y="195" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Products</text>
 
-      // SVG
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.classList.add("lines");
-      svg.style.height = maxY + "px";
+      <!-- Legal -->
+      <rect x="730" y="162" width="120" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="790" y="187" text-anchor="middle" fill="#334155" font-size="13" font-weight="600" font-family="system-ui, sans-serif">Legal</text>
 
-      function makePath(d, color, dashed) {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", d);
-        path.setAttribute("fill", "none");
-        path.setAttribute("stroke", color);
-        path.setAttribute("stroke-width", "2");
-        if (dashed) path.setAttribute("stroke-dasharray", "6,4");
-        return path;
-      }
+      <!-- Fintech GM -->
+      <rect x="55" y="262" width="130" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="120" y="287" text-anchor="middle" fill="#334155" font-size="13" font-weight="600" font-family="system-ui, sans-serif">Fintech GM</text>
 
-      // Solid lines (elbow style)
-      SOLID_LINES.forEach(([fromId, toId]) => {
-        const f = nodeById(fromId);
-        const t = nodeById(toId);
-        const fx = cx(f), fy = bot(f);
-        const tx = cx(t), ty = top(t);
-        const midY = (fy + ty) / 2;
-        const d = "M" + fx + "," + fy + " L" + fx + "," + midY + " L" + tx + "," + midY + " L" + tx + "," + ty;
-        svg.appendChild(makePath(d, "#94a3b8", false));
-      });
+      <!-- Trust & Safety -->
+      <rect x="205" y="262" width="130" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="270" y="280" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Trust &amp;</text>
+      <text x="270" y="295" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" font-family="system-ui, sans-serif">Safety</text>
 
-      // Dotted lines (curved)
-      DOTTED_LINES.forEach(({ from, to, color }) => {
-        const f = nodeById(from);
-        const t = nodeById(to);
-        const fx = cx(f), fy = top(f) + H / 2;
-        const tx = cx(t), ty = bot(t);
-        const d = "M" + fx + "," + fy + " C" + ((fx + tx) / 2) + "," + (fy - 40) + " " + ((fx + tx) / 2) + "," + (ty + 40) + " " + tx + "," + ty;
-        svg.appendChild(makePath(d, color, true));
-      });
+      <!-- Compliance -->
+      <rect x="730" y="262" width="120" height="40" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+      <text x="790" y="287" text-anchor="middle" fill="#334155" font-size="13" font-weight="600" font-family="system-ui, sans-serif">Compliance</text>
 
-      // Quarterly line (CRO → Board, curved around the left side)
-      {
-        const f = nodeById(QUARTERLY_LINE.from);
-        const t = nodeById(QUARTERLY_LINE.to);
-        const fx = f.x, fy = top(f) + H / 2;
-        const tx = t.x, ty = top(t) + H / 2;
-        const leftX = -20;
-        const d = "M" + fx + "," + fy +
-          " C" + leftX + "," + fy + " " + leftX + "," + ty + " " + tx + "," + ty;
-        svg.appendChild(makePath(d, QUARTERLY_LINE.color, true));
+      <!-- CRO -->
+      <rect x="60" y="362" width="120" height="40" rx="6" fill="#0c4a6e" filter="url(#shadow)"/>
+      <text x="120" y="387" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="system-ui, sans-serif">CRO</text>
 
-        // Label
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", leftX + 10);
-        text.setAttribute("y", (fy + ty) / 2);
-        text.setAttribute("fill", QUARTERLY_LINE.color);
-        text.setAttribute("font-size", "11");
-        text.setAttribute("font-family", "system-ui, sans-serif");
-        text.setAttribute("text-anchor", "start");
-        text.textContent = "Quarterly report";
-        svg.appendChild(text);
-      }
+      <!-- LEGEND -->
+      <g transform="translate(250,520)">
+        <line x1="0" y1="0" x2="30" y2="0" stroke="#94a3b8" stroke-width="2"/>
+        <text x="36" y="4" fill="#64748b" font-size="11" font-family="system-ui, sans-serif">Direct report</text>
 
-      chart.insertBefore(svg, chart.firstChild);
-    </script>
+        <line x1="160" y1="0" x2="190" y2="0" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="6,4"/>
+        <text x="196" y="4" fill="#64748b" font-size="11" font-family="system-ui, sans-serif">Dotted-line relationship</text>
+
+        <line x1="380" y1="0" x2="410" y2="0" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,4"/>
+        <text x="416" y="4" fill="#64748b" font-size="11" font-family="system-ui, sans-serif">Quarterly board report</text>
+      </g>
+    </svg>
   </body>
 </html>
