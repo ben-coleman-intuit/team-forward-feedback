@@ -82,11 +82,15 @@ function calculate() {
   const result = document.getElementById("result");
   const totalEl = document.getElementById("result-total");
   const breakdownEl = document.getElementById("result-breakdown");
+  const placeholder = document.getElementById("result-placeholder");
 
   if (!activeScenario) {
     result.classList.add("hidden");
+    if (placeholder) placeholder.classList.remove("hidden");
     return;
   }
+
+  if (placeholder) placeholder.classList.add("hidden");
 
   const scenario = SCENARIOS.find((s) => s.id === activeScenario);
   if (!scenario) return;
