@@ -24,6 +24,38 @@ main {
   padding: 2.5rem 1rem 4rem;
 }
 
+/* Trip length toggle */
+.trip-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.trip-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.trip-btn {
+  padding: 0.35rem 1rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.trip-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0c1222;
+}
+
 .top-row {
   display: flex;
   gap: 1.5rem;

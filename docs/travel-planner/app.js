@@ -68,6 +68,8 @@ const SCENARIOS = [
 ];
 
 let activeScenario = null;
+let tripDays = 3;
+const TWO_DAY_DISCOUNT = 600;
 
 function getVal(id) {
   const el = document.getElementById(id);
@@ -101,7 +103,8 @@ function calculate() {
   GEOS.forEach((geo) => {
     const hc = getVal("hc_" + geo.key);
     const mgr = getVal("mgr_" + geo.key);
-    const cost = getVal("cost_" + geo.key);
+    const baseCost = getVal("cost_" + geo.key);
+    const cost = tripDays === 2 ? Math.max(0, baseCost - TWO_DAY_DISCOUNT) : baseCost;
     const group = scenario.who(geo);
 
     let travelers = 0;
@@ -144,6 +147,15 @@ function calculate() {
 function init() {
   const grid = document.getElementById("geo-grid");
   const picker = document.getElementById("scenario-picker");
+
+  document.querySelectorAll(".trip-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".trip-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      tripDays = Number(btn.dataset.days);
+      calculate();
+    });
+  });
 
   GEOS.forEach((geo) => {
     const card = document.createElement("div");
