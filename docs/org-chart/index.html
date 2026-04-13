@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Org chart</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: #fff;
+        color: #1a1a1a;
+        padding: 2rem;
+      }
+
+      @media print {
+        body { padding: 0.5in; }
+      }
+
+      .chart {
+        position: relative;
+        width: 960px;
+        margin: 0 auto;
+      }
+
+      .box {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 6px;
+        padding: 8px 14px;
+        white-space: nowrap;
+        line-height: 1.3;
+      }
+
+      .box.primary {
+        background: #1e293b;
+        color: #fff;
+        border: 2px solid #1e293b;
+      }
+
+      .box.secondary {
+        background: #f1f5f9;
+        color: #334155;
+        border: 2px solid #cbd5e1;
+      }
+
+      .box.highlight {
+        background: #0c4a6e;
+        color: #fff;
+        border: 2px solid #0c4a6e;
+      }
+
+      svg.lines {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .legend {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        margin-top: 1rem;
+        font-size: 12px;
+        color: #64748b;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .legend-line {
+        width: 30px;
+        height: 0;
+      }
+
+      .legend-line.solid {
+        border-top: 2px solid #94a3b8;
+      }
+
+      .legend-line.dotted {
+        border-top: 2px dashed #0ea5e9;
+      }
+
+      .legend-line.quarterly {
+        border-top: 2px dashed #f59e0b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chart" id="chart"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-line solid"></div> Direct report</div>
+      <div class="legend-item"><div class="legend-line dotted"></div> Dotted-line relationship</div>
+      <div class="legend-item"><div class="legend-line quarterly"></div> Quarterly board report</div>
+    </div>
+    <script>
+      const NODES = [
+        { id: "board",       label: "Board",                x: 430, y: 0,   style: "primary", w: 100 },
+        { id: "ceo",         label: "CEO",                  x: 430, y: 80,  style: "primary", w: 100 },
+        { id: "cto",         label: "CTO",                  x: 120, y: 180, style: "secondary", w: 100 },
+        { id: "consumer",    label: "Consumer\nProducts",    x: 310, y: 180, style: "secondary", w: 120 },
+        { id: "business",    label: "Business\nProducts",    x: 510, y: 180, style: "secondary", w: 120 },
+        { id: "legal",       label: "Legal",                x: 720, y: 180, style: "secondary", w: 100 },
+        { id: "fintech",     label: "Fintech GM",           x: 60,  y: 300, style: "secondary", w: 110 },
+        { id: "trust",       label: "Trust &\nSafety",      x: 210, y: 300, style: "secondary", w: 100 },
+        { id: "compliance",  label: "Compliance",           x: 720, y: 300, style: "secondary", w: 110 },
+        { id: "cro",         label: "CRO",                  x: 60,  y: 420, style: "highlight", w: 100 },
+      ];
+
+      const SOLID_LINES = [
+        ["board", "ceo"],
+        ["ceo", "cto"],
+        ["ceo", "consumer"],
+        ["ceo", "business"],
+        ["ceo", "legal"],
+        ["cto", "fintech"],
+        ["cto", "trust"],
+        ["legal", "compliance"],
+        ["fintech", "cro"],
+      ];
+
+      const DOTTED_LINES = [
+        { from: "cro", to: "trust", color: "#0ea5e9" },
+        { from: "cro", to: "compliance", color: "#0ea5e9" },
+      ];
+
+      const QUARTERLY_LINE = { from: "cro", to: "board", color: "#f59e0b" };
+
+      const chart = document.getElementById("chart");
+      const H = 40;
+
+      // Render boxes
+      NODES.forEach((n) => {
+        const div = document.createElement("div");
+        div.className = "box " + n.style;
+        div.id = "node-" + n.id;
+        div.style.left = n.x + "px";
+        div.style.top = n.y + "px";
+        div.style.width = n.w + "px";
+        div.style.height = H + "px";
+        div.innerHTML = n.label.replace(/\n/g, "<br>");
+        chart.appendChild(div);
+      });
+
+      // Compute chart height
+      const maxY = Math.max(...NODES.map((n) => n.y)) + H + 40;
+      chart.style.height = maxY + "px";
+
+      function cx(n) { return n.x + n.w / 2; }
+      function top(n) { return n.y; }
+      function bot(n) { return n.y + H; }
+
+      function nodeById(id) { return NODES.find((n) => n.id === id); }
+
+      // SVG
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.classList.add("lines");
+      svg.style.height = maxY + "px";
+
+      function makePath(d, color, dashed) {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", d);
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", color);
+        path.setAttribute("stroke-width", "2");
+        if (dashed) path.setAttribute("stroke-dasharray", "6,4");
+        return path;
+      }
+
+      // Solid lines (elbow style)
+      SOLID_LINES.forEach(([fromId, toId]) => {
+        const f = nodeById(fromId);
+        const t = nodeById(toId);
+        const fx = cx(f), fy = bot(f);
+        const tx = cx(t), ty = top(t);
+        const midY = (fy + ty) / 2;
+        const d = "M" + fx + "," + fy + " L" + fx + "," + midY + " L" + tx + "," + midY + " L" + tx + "," + ty;
+        svg.appendChild(makePath(d, "#94a3b8", false));
+      });
+
+      // Dotted lines (curved)
+      DOTTED_LINES.forEach(({ from, to, color }) => {
+        const f = nodeById(from);
+        const t = nodeById(to);
+        const fx = cx(f), fy = top(f) + H / 2;
+        const tx = cx(t), ty = bot(t);
+        const d = "M" + fx + "," + fy + " C" + ((fx + tx) / 2) + "," + (fy - 40) + " " + ((fx + tx) / 2) + "," + (ty + 40) + " " + tx + "," + ty;
+        svg.appendChild(makePath(d, color, true));
+      });
+
+      // Quarterly line (CRO → Board, curved around the left side)
+      {
+        const f = nodeById(QUARTERLY_LINE.from);
+        const t = nodeById(QUARTERLY_LINE.to);
+        const fx = f.x, fy = top(f) + H / 2;
+        const tx = t.x, ty = top(t) + H / 2;
+        const leftX = -20;
+        const d = "M" + fx + "," + fy +
+          " C" + leftX + "," + fy + " " + leftX + "," + ty + " " + tx + "," + ty;
+        svg.appendChild(makePath(d, QUARTERLY_LINE.color, true));
+
+        // Label
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", leftX + 10);
+        text.setAttribute("y", (fy + ty) / 2);
+        text.setAttribute("fill", QUARTERLY_LINE.color);
+        text.setAttribute("font-size", "11");
+        text.setAttribute("font-family", "system-ui, sans-serif");
+        text.setAttribute("text-anchor", "start");
+        text.textContent = "Quarterly report";
+        svg.appendChild(text);
+      }
+
+      chart.insertBefore(svg, chart.firstChild);
+    </script>
+  </body>
+</html>
