@@ -3,8 +3,8 @@ const GEOS = [
   { key: "west", label: "West Coast", defaultCost: 1600, defaultHC: 13, defaultMgr: 2 },
   { key: "central", label: "Central", defaultCost: 2900, defaultHC: 16, defaultMgr: 1 },
   { key: "east", label: "East Coast", defaultCost: 3400, defaultHC: 0, defaultMgr: 2 },
-  { key: "nyc", label: "NYC", defaultCost: 3400, defaultHC: 19, defaultMgr: 3 },
-  { key: "tlv", label: "TLV (Israel)", defaultCost: 17000, defaultHC: 10, defaultMgr: 5 },
+  { key: "nyc", label: "NYC", defaultCost: 3400, defaultHC: 19, defaultMgr: 2 },
+  { key: "tlv", label: "TLV (Israel)", defaultCost: 17000, defaultHC: 10, defaultMgr: 1 },
 ];
 
 // Each scenario returns "all" | "managers" | false per geo
