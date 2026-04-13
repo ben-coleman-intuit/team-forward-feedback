@@ -1,7 +1,7 @@
 const GEOS = [
   { key: "mtv", label: "MTV", isDestination: true, defaultCost: 3400, defaultHC: 157, defaultMgr: 5 },
   { key: "west", label: "West Coast", defaultCost: 1600, defaultHC: 164, defaultMgr: 2 },
-  { key: "central", label: "Central", defaultCost: 2900, defaultHC: 76, defaultMgr: 1 },
+  { key: "central", label: "Central", defaultCost: 2900, defaultHC: 93, defaultMgr: 1 },
   { key: "east", label: "East Coast", defaultCost: 3400, defaultHC: 47, defaultMgr: 2 },
   { key: "nyc", label: "NYC", defaultCost: 3400, defaultHC: 19, defaultMgr: 3 },
   { key: "tlv", label: "TLV (Israel)", defaultCost: 17000, defaultHC: 10, defaultMgr: 5 },
