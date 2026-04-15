@@ -51,6 +51,15 @@
         gap: 1rem;
       }
 
+      .section-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        font-weight: 600;
+        margin-top: 0.75rem;
+      }
+
       label {
         display: block;
         font-size: 0.8rem;
@@ -121,9 +130,11 @@
       }
 
       .result-detail {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         color: var(--muted);
-        margin-top: 0.5rem;
+        margin-top: 0.75rem;
+        text-align: left;
+        line-height: 1.7;
       }
     </style>
   </head>
@@ -133,17 +144,40 @@
       <p class="intro">When does the money run out?</p>
 
       <div class="fields">
+        <div class="section-label">Today</div>
         <div>
-          <label for="principal">Principal</label>
+          <label for="currentAge">Current age</label>
+          <input type="number" id="currentAge" value="40" min="1" max="120" />
+        </div>
+        <div>
+          <label for="principal">Current principal</label>
           <div class="input-wrap">
             <span class="prefix">$</span>
-            <input type="number" id="principal" class="has-prefix" value="1000000" min="0" step="10000" />
+            <input type="number" id="principal" class="has-prefix" value="500000" min="0" step="10000" />
           </div>
         </div>
         <div>
-          <label for="startAge">Starting age</label>
-          <input type="number" id="startAge" value="65" min="1" max="120" />
+          <label for="savingsPerYear">Annual savings (until retirement)</label>
+          <div class="input-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="savingsPerYear" class="has-prefix" value="30000" min="0" step="1000" />
+          </div>
         </div>
+
+        <div class="section-label">Retirement</div>
+        <div>
+          <label for="retireAge">Retirement age</label>
+          <input type="number" id="retireAge" value="65" min="1" max="120" />
+        </div>
+        <div>
+          <label for="withdrawal">Annual withdrawal (today's dollars)</label>
+          <div class="input-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="withdrawal" class="has-prefix" value="80000" min="0" step="1000" />
+          </div>
+        </div>
+
+        <div class="section-label">Assumptions</div>
         <div>
           <label for="returnRate">Annual return</label>
           <div class="input-wrap">
@@ -158,13 +192,6 @@
             <span class="suffix">%</span>
           </div>
         </div>
-        <div>
-          <label for="withdrawal">Annual withdrawal</label>
-          <div class="input-wrap">
-            <span class="prefix">$</span>
-            <input type="number" id="withdrawal" class="has-prefix" value="50000" min="0" step="1000" />
-          </div>
-        </div>
       </div>
 
       <div class="result-card">
@@ -175,46 +202,67 @@
     </main>
 
     <script>
+      function fmt(n) {
+        return "$" + Math.round(n).toLocaleString("en-US");
+      }
+
       function calculate() {
-        let principal = Number(document.getElementById("principal").value) || 0;
-        const startAge = Number(document.getElementById("startAge").value) || 65;
+        const currentAge = Number(document.getElementById("currentAge").value) || 40;
+        const principal = Number(document.getElementById("principal").value) || 0;
+        const savingsPerYear = Number(document.getElementById("savingsPerYear").value) || 0;
+        const retireAge = Number(document.getElementById("retireAge").value) || 65;
+        const withdrawalToday = Number(document.getElementById("withdrawal").value) || 0;
         const annualReturn = (Number(document.getElementById("returnRate").value) || 0) / 100;
         const inflation = (Number(document.getElementById("inflation").value) || 0) / 100;
-        let withdrawal = Number(document.getElementById("withdrawal").value) || 0;
 
         const resultEl = document.getElementById("result-value");
         const detailEl = document.getElementById("result-detail");
 
-        if (principal <= 0 || withdrawal <= 0) {
+        if (principal <= 0 || withdrawalToday <= 0 || retireAge <= currentAge) {
           resultEl.textContent = "—";
           resultEl.style.color = "";
           detailEl.textContent = "";
           return;
         }
 
-        const maxYears = 200;
-        let age = startAge;
-        let years = 0;
+        // Phase 1: accumulation (current age → retirement age)
+        const accumYears = retireAge - currentAge;
         let balance = principal;
-        let yearlyWithdrawal = withdrawal;
+        for (let i = 0; i < accumYears; i++) {
+          balance = balance * (1 + annualReturn) + savingsPerYear;
+        }
 
-        while (balance > 0 && years < maxYears) {
+        // Adjust withdrawal for inflation from now to retirement
+        let yearlyWithdrawal = withdrawalToday * Math.pow(1 + inflation, accumYears);
+
+        const balanceAtRetirement = balance;
+
+        // Phase 2: drawdown (retirement → $0)
+        const maxYears = 200;
+        let age = retireAge;
+        let drawdownYears = 0;
+
+        while (balance > 0 && drawdownYears < maxYears) {
           balance = balance * (1 + annualReturn);
           balance -= yearlyWithdrawal;
           yearlyWithdrawal *= (1 + inflation);
-          years++;
+          drawdownYears++;
           age++;
         }
 
-        if (years >= maxYears) {
+        const details =
+          "Principal at retirement: " + fmt(balanceAtRetirement) + "\n" +
+          "First year withdrawal: " + fmt(withdrawalToday * Math.pow(1 + inflation, accumYears)) + "\n" +
+          "Years saving: " + accumYears + " · Years withdrawing: " + drawdownYears;
+
+        if (drawdownYears >= maxYears) {
           resultEl.textContent = "Never";
           resultEl.style.color = "#4ade80";
-          detailEl.textContent = "Money outlasts 200+ years at these rates.";
+          detailEl.textContent = details + "\nMoney outlasts 200+ years at these rates.";
         } else {
           resultEl.textContent = age;
           resultEl.style.color = age >= 95 ? "#4ade80" : age >= 80 ? "#f59e0b" : "#f87171";
-          detailEl.textContent = years + " years of withdrawals. Final year withdrawal: $" +
-            Math.round(yearlyWithdrawal / (1 + inflation)).toLocaleString();
+          detailEl.textContent = details;
         }
       }
 
