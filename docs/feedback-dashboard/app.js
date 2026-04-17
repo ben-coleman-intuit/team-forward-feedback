@@ -136,13 +136,27 @@ function init() {
 
   let activeMember = null;
 
+  const exportBtn = document.getElementById("export-btn");
+
   function render() {
     cardsEl.innerHTML = "";
     const show = activeMember ? [activeMember] : names;
     show.forEach((name) => {
       cardsEl.appendChild(buildMemberCard(name, members[name]));
     });
+    exportBtn.classList.toggle("hidden", !activeMember);
   }
+
+  exportBtn.addEventListener("click", () => {
+    if (!activeMember) return;
+    summaryBar.classList.add("hidden");
+    exportBtn.classList.add("hidden");
+    document.body.classList.add("printing");
+    window.print();
+    summaryBar.classList.remove("hidden");
+    exportBtn.classList.remove("hidden");
+    document.body.classList.remove("printing");
+  });
 
   names.forEach((name) => {
     const chip = document.createElement("span");

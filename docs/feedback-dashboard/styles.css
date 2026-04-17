@@ -121,3 +121,45 @@ h1 { font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0 0; }
 }
 
 .hidden { display: none !important; }
+
+.export-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: var(--accent);
+  color: #0c1222;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+    color: #1a1a1a !important;
+    padding: 0.5in;
+  }
+
+  .eyebrow, .intro, #summary-bar, .export-btn { display: none !important; }
+
+  main { padding: 0; max-width: 100%; }
+
+  h1 { display: none; }
+
+  .member-card {
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    break-inside: avoid;
+  }
+
+  .member-card h2 { color: #1a1a1a; }
+  .member-meta { color: #666; }
+  .section-title { color: #0ea5e9; }
+  .skill-label { color: #1a1a1a; }
+  .skill-bar-bg { background: #e5e7eb; }
+  .narrative-block { background: #f9fafb; border-color: #e5e7eb; color: #1a1a1a; }
+  .narrative-block .narrator { color: #666; }
+  .value-tag { background: #e0f2fe; color: #0369a1; }
+  .value-count { color: #666; }
+}
