@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Payments cohort loss rate</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <style>
+      body {
+        margin: 0; min-height: 100vh;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: #09090b; color: #fafafa; padding: 2rem;
+      }
+      main { max-width: 64rem; margin: 0 auto; }
+      h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+      .sub { color: #a1a1aa; font-size: 0.85rem; margin: 0 0 1.5rem; }
+      canvas { background: #18181b; border-radius: 0.75rem; padding: 1rem; }
+      @media print { body { background: #fff; color: #1a1a1a; } canvas { background: #fff; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Payments cohort loss rate (bps)</h1>
+      <p class="sub">Chargebacks and transactions both cohorted to month of transaction date. Source: ips_chargebacks_e2e / ips_ihub_merchant_transactions.</p>
+      <canvas id="chart"></canvas>
+    </main>
+    <script>
+      const data = [
+        {m:"2024-01",bps:10.63},{m:"2024-02",bps:10.55},{m:"2024-03",bps:9.99},
+        {m:"2024-04",bps:11.25},{m:"2024-05",bps:8.77},{m:"2024-06",bps:9.69},
+        {m:"2024-07",bps:9.11},{m:"2024-08",bps:6.85},{m:"2024-09",bps:8.78},
+        {m:"2024-10",bps:8.34},{m:"2024-11",bps:7.47},{m:"2024-12",bps:8.10},
+        {m:"2025-01",bps:9.17},{m:"2025-02",bps:8.68},{m:"2025-03",bps:9.69},
+        {m:"2025-04",bps:9.08},{m:"2025-05",bps:8.19},{m:"2025-06",bps:8.92},
+        {m:"2025-07",bps:8.74},{m:"2025-08",bps:8.78},{m:"2025-09",bps:8.42},
+        {m:"2025-10",bps:8.05},{m:"2025-11",bps:8.90},{m:"2025-12",bps:7.94},
+        {m:"2026-01",bps:8.16},{m:"2026-02",bps:6.05},{m:"2026-03",bps:4.28},
+      ];
+
+      new Chart(document.getElementById("chart"), {
+        type: "line",
+        data: {
+          labels: data.map(d => d.m),
+          datasets: [{
+            label: "Loss rate (bps)",
+            data: data.map(d => d.bps),
+            borderColor: "#0ea5e9",
+            backgroundColor: "rgba(14,165,233,0.1)",
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: "#0ea5e9",
+            borderWidth: 2,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ctx.parsed.y.toFixed(2) + " bps"
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: "#a1a1aa", maxRotation: 45 },
+              grid: { color: "#27272a" }
+            },
+            y: {
+              title: { display: true, text: "Basis points", color: "#a1a1aa" },
+              ticks: { color: "#a1a1aa" },
+              grid: { color: "#27272a" },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
