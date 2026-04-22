@@ -21,20 +21,20 @@
   <body>
     <main>
       <h1>Payments cohort loss rate (bps)</h1>
-      <p class="sub">Chargebacks and transactions both cohorted to month of transaction date. Source: ips_chargebacks_e2e / ips_ihub_merchant_transactions.</p>
+      <p class="sub">Hard write-offs and transactions both cohorted to month of transaction date. Source: ips_chargebacks_e2e (hard_writeoff) / ips_ihub_merchant_transactions. Note: recent months may appear low as write-offs mature.</p>
       <canvas id="chart"></canvas>
     </main>
     <script>
       const data = [
-        {m:"2024-01",bps:10.63},{m:"2024-02",bps:10.55},{m:"2024-03",bps:9.99},
-        {m:"2024-04",bps:11.25},{m:"2024-05",bps:8.77},{m:"2024-06",bps:9.69},
-        {m:"2024-07",bps:9.11},{m:"2024-08",bps:6.85},{m:"2024-09",bps:8.78},
-        {m:"2024-10",bps:8.34},{m:"2024-11",bps:7.47},{m:"2024-12",bps:8.10},
-        {m:"2025-01",bps:9.17},{m:"2025-02",bps:8.68},{m:"2025-03",bps:9.69},
-        {m:"2025-04",bps:9.08},{m:"2025-05",bps:8.19},{m:"2025-06",bps:8.92},
-        {m:"2025-07",bps:8.74},{m:"2025-08",bps:8.78},{m:"2025-09",bps:8.42},
-        {m:"2025-10",bps:8.05},{m:"2025-11",bps:8.90},{m:"2025-12",bps:7.94},
-        {m:"2026-01",bps:8.16},{m:"2026-02",bps:6.05},{m:"2026-03",bps:4.28},
+        {m:"2024-01",bps:4.15},{m:"2024-02",bps:3.72},{m:"2024-03",bps:3.70},
+        {m:"2024-04",bps:4.52},{m:"2024-05",bps:3.35},{m:"2024-06",bps:4.08},
+        {m:"2024-07",bps:3.55},{m:"2024-08",bps:2.57},{m:"2024-09",bps:3.69},
+        {m:"2024-10",bps:3.40},{m:"2024-11",bps:2.64},{m:"2024-12",bps:3.38},
+        {m:"2025-01",bps:3.91},{m:"2025-02",bps:3.41},{m:"2025-03",bps:3.57},
+        {m:"2025-04",bps:3.42},{m:"2025-05",bps:3.18},{m:"2025-06",bps:3.47},
+        {m:"2025-07",bps:3.65},{m:"2025-08",bps:3.74},{m:"2025-09",bps:3.17},
+        {m:"2025-10",bps:3.00},{m:"2025-11",bps:3.01},{m:"2025-12",bps:2.45},
+        {m:"2026-01",bps:2.08},{m:"2026-02",bps:1.05},{m:"2026-03",bps:0.54},
       ];
 
       new Chart(document.getElementById("chart"), {
