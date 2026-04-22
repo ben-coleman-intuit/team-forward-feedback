@@ -1,5 +1,89 @@
-// Hardcoded from Google Sheet "Responses" tab — deduped (Sarah→Tyler kept once)
-const RAW = [
+const SHEET_ID = "1wALFnQMNQEiSvv4jV3OAF4M67ErGSRBAJ3vkziHUVf0";
+const SHEET_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
+  "/gviz/tq?tqx=out:csv&sheet=Responses";
+
+function parseCSV(text) {
+  const rows = [];
+  let current = "";
+  let inQuotes = false;
+  let row = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"' && text[i + 1] === '"') { current += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { current += ch; }
+    } else {
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === ',') { row.push(current); current = ""; }
+      else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
+        if (ch === '\r') i++;
+        row.push(current); current = "";
+        rows.push(row); row = [];
+      } else { current += ch; }
+    }
+  }
+  if (current || row.length) { row.push(current); rows.push(row); }
+  return rows;
+}
+
+function parseSkills(s) {
+  const skills = {};
+  (s || "").split(/\r?\n/).forEach((line) => {
+    const m = line.match(/^(.+?):\s*(\d+)/);
+    if (m) skills[m[1].trim()] = Number(m[2]);
+  });
+  return skills;
+}
+
+function parseValues(s) {
+  return (s || "").split(";").map((v) => v.trim()).filter(Boolean);
+}
+
+function csvToRaw(rows) {
+  if (rows.length < 2) return [];
+  const seen = new Set();
+  const out = [];
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || r.length < 12) continue;
+    const name = (r[3] || "").trim();
+    const from = (r[1] || "").trim();
+    const dedupKey = name + "|" + from;
+    if (seen.has(dedupKey)) continue;
+    seen.add(dedupKey);
+    out.push({
+      name,
+      from,
+      rel: (r[5] || "").trim(),
+      level: (r[6] || "").trim(),
+      skills: parseSkills(r[7]),
+      values: parseValues(r[8]),
+      bestWork: (r[9] || "").trim(),
+      advice: (r[10] || "").trim(),
+      other: (r[11] || "").trim(),
+    });
+  }
+  return out;
+}
+
+async function fetchLiveData() {
+  try {
+    const res = await fetch(SHEET_CSV_URL);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    const data = csvToRaw(rows);
+    if (data.length > 0) return data;
+  } catch (e) {
+    console.warn("Live fetch failed, using fallback:", e);
+  }
+  return FALLBACK;
+}
+
+// Fallback data (last known snapshot)
+const FALLBACK = [
   {name:"Sam Caslowitz",from:"Megha Sethi",rel:"stakeholder",level:"Senior",skills:{"Technical Craft":8,"Execution":8,"Customer Centric Outcomes":9,"Speed":7,"Communication":10},values:["Courage","Customer obsession","Integrity without compromise","Stronger together"],bestWork:"This year, I've watched Sam step up to lead and drive a broader cross-functional leadership team. He's done a great job bringing structure to the agenda, connecting discussion topics to what matters most across the org, and ensuring planning stays well ahead of schedule.",advice:"",other:""},
   {name:"Sam Caslowitz",from:"Joel Putz",rel:"stakeholder",level:"Senior",skills:{"Technical Craft":9,"Execution":10,"Customer Centric Outcomes":10,"Speed":9,"Communication":10},values:["Integrity without compromise","Stronger together"],bestWork:"Sam partnered with Sarah Zimmerman to create an incredibly impactful dashboard which measured early merchant churn based on friction experienced (auth declines and payment holds specifically). This was an impactful piece of work as it enabled two different capabilities — highlighting to the Policy and Experience teams the impact AND a deep dive into each teammate to determine who is best at delivering the bad news to a customer.",advice:"I don't have anything to add here as my interactions with Sam have been very limited to this one dashboard.",other:""},
   {name:"Yukti Bishambu",from:"Quan Hu",rel:"peer",level:"Analyst",skills:{"Technical Craft":10,"Execution":10,"Customer Centric Outcomes":10,"Speed":10,"Communication":9},values:["Courage","Stronger together","We care and give back"],bestWork:"Since joining the team, Yukti has shown impressive growth and has taken on her responsibilities with remarkable speed. She is a true team player who consistently demonstrates a willingness to learn and a readiness to support her colleagues whenever needed.\nWhat stands out most is her proactive nature; she is not only eager to master her own domain but is also actively stepping out of her comfort zone to understand the broader business. I am particularly impressed with how quickly she has adopted new AI tools into her workflow to drive efficiency.",advice:"Yukti is ready for more cross-functional exposure. I suggest giving her opportunities to lead or support projects that involve the broader team and external stakeholders.",other:""},
@@ -42,9 +126,9 @@ function scoreColor(v, max) {
   return `rgb(${Math.round(161+(74-161)*p)},${Math.round(161+(222-161)*p)},${Math.round(161+(128-161)*p)})`;
 }
 
-function groupByMember() {
+function groupByMember(data) {
   const map = {};
-  RAW.forEach((r) => {
+  data.forEach((r) => {
     if (!map[r.name]) map[r.name] = [];
     map[r.name].push(r);
   });
@@ -138,8 +222,9 @@ function buildMemberCard(name, responses) {
   return card;
 }
 
-function init() {
-  const members = groupByMember();
+async function init() {
+  const RAW = await fetchLiveData();
+  const members = groupByMember(RAW);
   const names = Object.keys(members).sort();
   const summaryBar = document.getElementById("summary-bar");
   const cardsEl = document.getElementById("cards");
